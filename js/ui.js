@@ -57,14 +57,15 @@ const UI = {
         item.dataset.id = book.id;
         item.dataset.status = book.status;
 
+        const title = book.title || '無題';
         const genre = book.tags && book.tags[0] ? book.tags[0] : null;
         const genreColor = genre ? DataManager.getGenreColor(genre) : 'var(--genre-default)';
         const progress = DataManager.getProgress(book);
 
         const coverHtml = book.coverUrl
-            ? `<img src="${book.coverUrl}" alt="${book.title}" loading="lazy">`
+            ? `<img src="${book.coverUrl}" alt="${title}" loading="lazy">`
             : `<div class="cover-placeholder" style="background: linear-gradient(135deg, ${genreColor}22, ${genreColor}44)">
-                    <span class="cover-text" style="color: ${genreColor}; text-shadow: none;">${book.title.substring(0, 4)}</span>
+                    <span class="cover-text" style="color: ${genreColor}; text-shadow: none;">${title.substring(0, 4)}</span>
                </div>`;
 
         // Status indicator (Simplified)
@@ -98,7 +99,7 @@ const UI = {
                 ${statusBadge}
             </div>
             <div class="book-info">
-                <div class="book-title">${book.title}</div>
+                <div class="book-title">${title}</div>
                 <div class="book-meta">
                     <span class="book-author clickable" data-search="${book.author || ''}">${book.author || '著者不明'}</span>
                 </div>
