@@ -92,23 +92,41 @@ body::before {
     padding-top: var(--header-safe-area);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding-left: 20px;
-    padding-right: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    justify-content: center;
+    /* Center content */
+    padding-left: 16px;
+    padding-right: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
     z-index: 100;
 }
 
+.header-left,
+.header-right {
+    position: absolute;
+    top: calc(50% + var(--header-safe-area) / 2);
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-left {
+    left: 16px;
+}
+
+.header-right {
+    right: 16px;
+}
+
 .logo {
-    font-size: 1.25rem;
-    font-weight: 600;
-    background: linear-gradient(135deg, #fff 0%, rgba(255, 255, 255, 0.7) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: none;
+    -webkit-text-fill-color: initial;
 }
 
 .btn-icon {
@@ -290,6 +308,7 @@ body::before {
 }
 
 /* ===== Bookshelf Grid Container ===== */
+/* ===== Bookshelf Grid Container ===== */
 .bookshelf-container {
     position: fixed;
     top: calc(var(--header-height) + var(--filter-height) + var(--header-safe-area));
@@ -298,212 +317,166 @@ body::before {
     bottom: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px;
+    padding: 16px;
     padding-bottom: 80px;
 }
 
 .bookshelf-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 16px;
-    max-width: 1200px;
+    grid-template-columns: repeat(3, 1fr);
+    /* Fixed 3 columns for mobile */
+    gap: 12px 10px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
 @media (min-width: 600px) {
     .bookshelf-grid {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 20px;
-    }
-}
-
-@media (min-width: 900px) {
-    .bookshelf-grid {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 24px;
+        gap: 20px 16px;
     }
 }
 
-/* Book Item (Spine + Cover) */
+/* Book Item (Flat Style) */
 .book-item {
-    position: relative;
-    aspect-ratio: 2/3;
-    perspective: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     cursor: pointer;
-    transition: transform 0.3s ease;
-}
-
-.book-item:hover {
-    transform: translateY(-8px);
-    z-index: 10;
-}
-
-/* Book Spine - Left edge decoration */
-.book-spine {
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 8px;
-    background: var(--spine-color, var(--accent));
-    border-radius: 4px 0 0 4px;
-    box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.1);
-    z-index: 1;
+    position: relative;
 }
 
 /* Book Cover Wrapper */
 .book-cover-wrapper {
     position: relative;
     width: 100%;
-    height: 100%;
-    border-radius: 4px 8px 8px 4px;
+    aspect-ratio: 2/3;
+    border-radius: 6px;
     overflow: hidden;
-    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
-    box-shadow:
-        4px 4px 12px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8),
-        0 0 0 1px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    background: #f1f5f9;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.2s;
 }
 
-.book-item:hover .book-cover-wrapper {
-    box-shadow:
-        8px 12px 24px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transform: rotateY(-5deg);
+.book-item:active .book-cover-wrapper {
+    opacity: 0.8;
 }
 
 .book-cover-wrapper img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    display: block;
 }
 
-.book-item:hover .book-cover-wrapper img {
-    transform: scale(1.05);
+/* Book Info (Title & Meta) */
+.book-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
-/* Cover Placeholder for books without images */
-/* Cover Placeholder for books without images */
+.book-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    height: 2.6em;
+}
+
+.book-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.book-author {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+/* Status Badge (Ribbon Style) */
+.status-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 6px 0 6px 0;
+    z-index: 5;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.status-badge.finished {
+    background: #10b981;
+}
+
+.status-badge.reading {
+    background: #f59e0b;
+}
+
+.status-badge.owned {
+    background: #6366f1;
+    top: auto;
+    bottom: 0;
+    left: auto;
+    right: 0;
+    border-radius: 6px 0 6px 0;
+}
+
+/* Reading Progress Bar (Slim) */
+.reading-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.progress-fill {
+    height: 100%;
+    background: #10b981;
+}
+
+/* Cover Placeholder */
 .cover-placeholder {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    background: #e2e8f0;
+    padding: 8px;
     text-align: center;
-    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
 }
 
 .cover-text {
     font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-shadow: none;
-    word-break: break-all;
-    line-height: 1.2;
-}
-
-/* Reading Progress Overlay */
-.reading-progress {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 24px;
-    background: linear-gradient(0deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 4px;
-}
-
-.reading-progress::before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 4px;
-    width: var(--progress, 0%);
-    background: linear-gradient(90deg, #10b981, #34d399);
-    border-radius: 0 2px 0 0;
-}
-
-.reading-progress .progress-text {
-    font-size: 0.65rem;
     font-weight: 700;
-    color: #059669;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 1);
-}
-
-/* Status Indicator */
-.status-indicator {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    font-size: 1rem;
-    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
-}
-
-/* Ownership Badge */
-.ownership-badge {
-    position: absolute;
-    top: 4px;
-    left: 8px;
-    font-size: 0.6rem;
-    padding: 2px 6px;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--text-primary);
-    border-radius: 4px;
-    font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Book Tooltip */
-.book-tooltip {
-    position: absolute;
-    bottom: -60px;
-    left: 50%;
-    transform: translateX(-50%) scale(0.9);
-    width: max-content;
-    max-width: 180px;
-    padding: 8px 12px;
-    background: white;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    z-index: 20;
-    text-align: center;
-}
-
-.book-tooltip strong {
-    display: block;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 2px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.book-tooltip span {
-    font-size: 0.7rem;
     color: var(--text-secondary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
+    line-height: 1.4;
+    word-break: break-all;
 }
 
-.book-item:hover .book-tooltip {
-    opacity: 1;
-    transform: translateX(-50%) scale(1);
+/* Hide unused elements from previous style just in case */
+.book-spine,
+.book-tooltip,
+.status-indicator,
+.ownership-badge,
+.reading-progress {
+    display: none;
 }
 
 /* Empty State */

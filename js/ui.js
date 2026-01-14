@@ -63,38 +63,35 @@ const UI = {
 
         const coverHtml = book.coverUrl
             ? `<img src="${book.coverUrl}" alt="${book.title}" loading="lazy">`
-            : `<div class="cover-placeholder" style="background: linear-gradient(135deg, ${genreColor}, ${genreColor}88)">
-                    <span class="cover-text">${book.title.substring(0, 4)}</span>
+            : `<div class="cover-placeholder" style="background: linear-gradient(135deg, ${genreColor}22, ${genreColor}44)">
+                    <span class="cover-text" style="color: ${genreColor}; text-shadow: none;">${book.title.substring(0, 4)}</span>
                </div>`;
 
-        // Status indicator
-        const statusIcon = {
-            'reading': '📖',
-            'finished': '✅',
-            'wish': '⭐'
-        }[book.status] || '';
-
-        // Ownership badge
-        const ownershipBadge = book.ownership ? {
-            'owned': '所有',
-            'borrowed': '借',
-            'digital': '📱'
-        }[book.ownership] || '' : '';
+        // Status indicator (Simplified)
+        let statusBadge = '';
+        if (book.status === 'finished') {
+            statusBadge = `<div class="status-badge finished">完読</div>`;
+        } else if (book.status === 'reading') {
+            statusBadge = `<div class="status-badge reading">読書中</div>`;
+        } else if (book.ownership === 'owned') {
+            // Only show owned if not handled above
+            statusBadge = `<div class="status-badge owned">所持</div>`;
+        }
 
         item.innerHTML = `
-            <div class="book-spine" style="--spine-color: ${genreColor}"></div>
             <div class="book-cover-wrapper">
                 ${coverHtml}
+                ${statusBadge}
                 ${book.status === 'reading' && progress > 0 ?
-                `<div class="reading-progress" style="--progress: ${progress}%">
-                        <span class="progress-text">${progress}%</span>
+                `<div class="reading-progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
                     </div>` : ''}
-                ${statusIcon ? `<span class="status-indicator">${statusIcon}</span>` : ''}
-                ${ownershipBadge ? `<span class="ownership-badge">${ownershipBadge}</span>` : ''}
             </div>
-            <div class="book-tooltip">
-                <strong>${book.title}</strong>
-                <span>${book.author || '著者不明'}</span>
+            <div class="book-info">
+                <div class="book-title">${book.title}</div>
+                <div class="book-meta">
+                    <span class="book-author">${book.author || '著者不明'}</span>
+                </div>
             </div>
         `;
 
