@@ -5,61 +5,66 @@
 /* ===== CSS Variables ===== */
 /* ===== CSS Variables ===== */
 :root {
-    /* Base Colors - International Blue Theme */
-    --bg-primary: #ffffff;
-    --bg-secondary: #f4f7ff;
-    --bg-card: #ffffff;
-    --bg-glass: rgba(255, 255, 255, 0.9);
-    --text-primary: #1a1a1a;
-    --text-secondary: #5C6B92;
-    --text-muted: #94a3b8;
-    --border-color: #E0E7FF;
-    --accent: #0044CC;
-    /* International Blue */
-    --accent-glow: rgba(0, 68, 204, 0.15);
+    /* Base Colors - Attica Blue Theme */
+    --primary-color: #0033FF;
+    --accent: #FFFFFF;
+    /* Accent is now White on Blue */
+    --accent-secondary: #60A5FA;
+    /* Lighter blue for subtle highlights */
 
-    /* Genre Colors - Adjusted for Blue Theme compatibility */
-    --genre-mystery: #0044CC;
-    --genre-romance: #E11D48;
-    --genre-sf: #0284C7;
-    --genre-horror: #7E22CE;
-    --genre-history: #B45309;
-    --genre-lightnovel: #16A34A;
-    --genre-literature: #9333EA;
-    --genre-science: #0891B2;
-    --genre-geography: #D97706;
-    --genre-politics: #DC2626;
-    --genre-business: #0D9488;
-    --genre-tech: #2563EB;
-    --genre-philosophy: #7C3AED;
-    --genre-selfhelp: #059669;
-    --genre-lifestyle: #EA580C;
-    --genre-art: #C026D3;
-    --genre-sports: #059669;
-    --genre-essay: #D97706;
-    --genre-nonfiction: #4F46E5;
-    --genre-language: #0D9488;
-    --genre-picture: #EA580C;
-    --genre-manga: #EF4444;
-    --genre-default: #64748B;
+    --bg-primary: #0044CC;
+    /* Vibrant International Blue Background */
+    --bg-secondary: rgba(255, 255, 255, 0.1);
+    --bg-card: rgba(255, 255, 255, 0.1);
+    --bg-glass: rgba(0, 51, 204, 0.85);
+    /* Deep Blue Glass */
+
+    --text-primary: #FFFFFF;
+    --text-secondary: rgba(255, 255, 255, 0.85);
+    --text-muted: rgba(255, 255, 255, 0.6);
+    --text-dark: #1a1a1a;
+
+    --border-color: rgba(255, 255, 255, 0.2);
 
     /* Spacing */
-    --header-height: 48px;
+    --header-height: 56px;
     --header-safe-area: env(safe-area-inset-top, 20px);
-    --bottom-nav-height: calc(56px + env(safe-area-inset-bottom, 20px));
+    --bottom-nav-height: calc(64px + env(safe-area-inset-bottom, 20px));
     --filter-height: 140px;
 
     /* Animation */
-    --transition-fast: 150ms ease;
-    --transition-normal: 300ms ease;
-    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Stylish Effects */
-    --shadow-soft: 0 4px 20px rgba(0, 40, 150, 0.08);
-    /* Blue-tinted shadow */
-    --shadow-card: 0 2px 8px rgba(0, 40, 150, 0.05);
-    --glass-bg: rgba(255, 255, 255, 0.92);
-    --gradient-primary: linear-gradient(135deg, #0044CC, #2563EB);
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.3);
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --glass-blur: blur(20px);
+
+    /* Genre Colors - Bright colors for dark background */
+    --genre-mystery: #F9A8D4;
+    --genre-romance: #FDA4AF;
+    --genre-sf: #7DD3FC;
+    --genre-horror: #C4B5FD;
+    --genre-history: #FCD34D;
+    --genre-lightnovel: #86EFAC;
+    --genre-literature: #D8B4FE;
+    --genre-science: #67E8F9;
+    --genre-geography: #FDBA74;
+    --genre-politics: #F87171;
+    --genre-business: #5EEAD4;
+    --genre-tech: #93C5FD;
+    --genre-philosophy: #A78BFA;
+    --genre-selfhelp: #6EE7B7;
+    --genre-lifestyle: #FB923C;
+    --genre-art: #E879F9;
+    --genre-sports: #6EE7B7;
+    --genre-essay: #FDBA74;
+    --genre-nonfiction: #818CF8;
+    --genre-language: #2DD4BF;
+    --genre-picture: #FB923C;
+    --genre-manga: #EF4444;
+    --genre-default: #CBD5E1;
 }
 
 /* ===== Reset & Base ===== */
@@ -106,14 +111,16 @@ body::before {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-left: 16px;
-    padding-right: 16px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    /* Center title */
+    padding-left: 20px;
+    padding-right: 20px;
+    background: rgba(0, 51, 204, 0.85);
+    /* Deep Blue Glass */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 100;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .logo-container {
@@ -161,12 +168,14 @@ body::before {
 }
 
 .logo {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: var(--accent);
-    /* International Blue */
+    font-size: 1.5rem;
+    font-weight: 900;
+    /* Extra Bold */
+    color: #FFFFFF;
     background: none;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .btn-icon {
@@ -208,11 +217,12 @@ body::before {
     left: 0;
     right: 0;
     padding: 12px 16px 4px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(0, 51, 204, 0.9);
+    /* Blue bg */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     z-index: 90;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .search-box {
@@ -224,11 +234,13 @@ body::before {
     width: 100%;
     height: 44px;
     padding: 0 44px;
-    background: var(--bg-glass);
-    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.15);
+    /* Semi-transparent white */
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
-    color: var(--text-primary);
+    color: #FFFFFF;
     font-size: 0.95rem;
+    font-weight: 500;
     outline: none;
     transition: var(--transition-fast);
 }
@@ -421,16 +433,17 @@ body::before {
     left: 0;
     right: 0;
     height: var(--bottom-nav-height);
-    background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(0, 51, 204, 0.85);
+    /* Deep Blue Glass */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     justify-content: space-around;
     align-items: center;
     padding-bottom: env(safe-area-inset-bottom, 20px);
     z-index: 100;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
 }
 
 .nav-item {
@@ -441,7 +454,8 @@ body::before {
     gap: 4px;
     color: var(--text-secondary);
     font-size: 0.7rem;
-    font-weight: 500;
+    font-weight: 700;
+    /* Bold */
     padding: 8px 12px;
     border: none;
     background: none;
@@ -565,20 +579,36 @@ body::before {
 }
 
 
-/* Book Item */
+/* Book Item - Glass Style */
 .book-item {
     display: flex;
     flex-direction: row;
-    /* Row layout for list view */
-    gap: 12px;
+    gap: 16px;
     cursor: pointer;
     position: relative;
     width: 100%;
     height: auto;
     align-items: flex-start;
-    background: white;
-    padding-bottom: 12px;
+    /* Align top */
+    background: rgba(255, 255, 255, 0.1);
+    /* Frosted glass */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.book-item:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.book-item:last-child {
     border-bottom: 1px solid var(--border-color);
+    /* Restore border for last item if needed, but we have border-radius now */
 }
 
 .book-item:last-child {
@@ -597,35 +627,42 @@ body::before {
 }
 
 /* Book Cover Wrapper */
+/* Book Cover Wrapper */
 .book-cover-wrapper {
     position: relative;
-    flex: 0 0 90px;
-    /* Fixed width for list view cover */
-    width: 90px;
-    aspect-ratio: 2/3;
-    border-radius: 4px;
+    flex: 0 0 auto;
+    /* Don't shrink */
+    width: auto;
+    height: 110px;
+    /* Fixed height for list view */
+    border-radius: 6px;
     overflow: hidden;
-    background: #f1f5f9;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 @media (min-width: 600px) {
     .book-cover-wrapper {
-        flex: 1;
         width: 100%;
-        max-width: 100%;
+        height: auto;
+        aspect-ratio: 2/3;
+        /* Grid view keeps aspect ratio */
     }
 }
 
 .book-item:active .book-cover-wrapper {
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .book-cover-wrapper img {
-    width: 100%;
     height: 100%;
-    object-fit: cover;
-    /* Cover is fine for list view thumbnails */
+    width: auto;
+    max-width: none;
+    /* Allow width to adjust */
+    object-fit: contain;
+    /* Ensure full image is visible */
+    background: #f0f0f0;
+    /* Fallback bg for transparency */
     display: block;
 }
 
@@ -635,24 +672,29 @@ body::before {
     flex-direction: column;
     gap: 4px;
     flex: 1;
-    text-align: left;
-    /* Left align for list view */
-    justify-content: center;
     min-width: 0;
+    /* CRITICAL: Allows flex child to truncate text */
+    text-align: left;
+    justify-content: flex-start;
 }
 
 .book-title {
-    font-size: 0.95rem;
+    font-size: 1.0rem;
     font-weight: 700;
-    color: var(--text-primary);
+    /* Bold */
+    color: #FFFFFF;
+    /* White text on blue */
     line-height: 1.3;
+    /* Word break settings */
+    word-break: break-word;
+    overflow-wrap: break-word;
+
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     margin-bottom: 2px;
-    height: auto;
 }
 
 .book-meta {
