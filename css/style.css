@@ -5,48 +5,48 @@
 /* ===== CSS Variables ===== */
 /* ===== CSS Variables ===== */
 :root {
-    /* Base Colors - White Theme */
-    --bg-primary: #f8fafc;
-    --bg-secondary: #ffffff;
+    /* Base Colors - International Blue Theme */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f4f7ff;
     --bg-card: #ffffff;
-    --bg-glass: rgba(255, 255, 255, 0.8);
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
+    --bg-glass: rgba(255, 255, 255, 0.9);
+    --text-primary: #1a1a1a;
+    --text-secondary: #5C6B92;
     --text-muted: #94a3b8;
-    --border-color: #e2e8f0;
-    --accent: #6366f1;
-    --accent-glow: rgba(99, 102, 241, 0.2);
+    --border-color: #E0E7FF;
+    --accent: #0044CC;
+    /* International Blue */
+    --accent-glow: rgba(0, 68, 204, 0.15);
 
-    /* Genre Colors - Adjusted for Light Theme */
-    --genre-mystery: #db2777;
-    --genre-romance: #e11d48;
-    --genre-sf: #0284c7;
-    --genre-horror: #7e22ce;
-    --genre-history: #b45309;
-    --genre-lightnovel: #16a34a;
-    --genre-literature: #9333ea;
-    --genre-science: #0891b2;
-    --genre-geography: #d97706;
-    --genre-politics: #dc2626;
-    --genre-business: #0d9488;
-    --genre-tech: #2563eb;
-    --genre-philosophy: #7c3aed;
+    /* Genre Colors - Adjusted for Blue Theme compatibility */
+    --genre-mystery: #0044CC;
+    --genre-romance: #E11D48;
+    --genre-sf: #0284C7;
+    --genre-horror: #7E22CE;
+    --genre-history: #B45309;
+    --genre-lightnovel: #16A34A;
+    --genre-literature: #9333EA;
+    --genre-science: #0891B2;
+    --genre-geography: #D97706;
+    --genre-politics: #DC2626;
+    --genre-business: #0D9488;
+    --genre-tech: #2563EB;
+    --genre-philosophy: #7C3AED;
     --genre-selfhelp: #059669;
-    --genre-lifestyle: #ea580c;
-    --genre-art: #c026d3;
+    --genre-lifestyle: #EA580C;
+    --genre-art: #C026D3;
     --genre-sports: #059669;
-    --genre-essay: #d97706;
-    --genre-nonfiction: #4f46e5;
-    --genre-language: #0d9488;
-    --genre-picture: #ea580c;
-    --genre-manga: #ef4444;
-    --genre-default: #64748b;
+    --genre-essay: #D97706;
+    --genre-nonfiction: #4F46E5;
+    --genre-language: #0D9488;
+    --genre-picture: #EA580C;
+    --genre-manga: #EF4444;
+    --genre-default: #64748B;
 
     /* Spacing */
     --header-height: 48px;
-    /* Compact header */
     --header-safe-area: env(safe-area-inset-top, 20px);
-    --bottom-nav-height: calc(60px + env(safe-area-inset-bottom, 20px));
+    --bottom-nav-height: calc(56px + env(safe-area-inset-bottom, 20px));
     --filter-height: 140px;
 
     /* Animation */
@@ -55,10 +55,11 @@
     --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Stylish Effects */
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.05);
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
-    --glass-bg: rgba(255, 255, 255, 0.85);
-    --gradient-primary: linear-gradient(135deg, #6366f1, #8b5cf6);
+    --shadow-soft: 0 4px 20px rgba(0, 40, 150, 0.08);
+    /* Blue-tinted shadow */
+    --shadow-card: 0 2px 8px rgba(0, 40, 150, 0.05);
+    --glass-bg: rgba(255, 255, 255, 0.92);
+    --gradient-primary: linear-gradient(135deg, #0044CC, #2563EB);
 }
 
 /* ===== Reset & Base ===== */
@@ -76,13 +77,17 @@ html {
 }
 
 body {
-    font-family: 'Outfit', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Noto Sans JP', sans-serif;
     background: var(--bg-primary);
     color: var(--text-primary);
     min-height: 100vh;
     min-height: 100dvh;
-    overflow: hidden;
+    overflow-x: hidden;
+    /* Fix horizontal scroll */
+    width: 100%;
     position: relative;
+    padding: 0;
+    margin: 0;
 }
 
 /* Background - Clean White */
@@ -156,11 +161,12 @@ body::before {
 }
 
 .logo {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    /* International Blue */
     background: none;
-    -webkit-text-fill-color: initial;
+    letter-spacing: -0.02em;
 }
 
 .btn-icon {
@@ -461,26 +467,7 @@ body::before {
     transform: translateY(-2px);
 }
 
-.nav-item-add {
-    transform: translateY(-16px);
-}
 
-.nav-item-add .add-btn-circle {
-    width: 48px;
-    height: 48px;
-    background: var(--gradient-primary);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.nav-item-add:active .add-btn-circle {
-    transform: scale(0.9);
-}
 
 /* Personal View Styles */
 .personal-view {
