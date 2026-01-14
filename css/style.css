@@ -316,7 +316,7 @@ body::before {
     bottom: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px;
+    padding: 12px;
     padding-bottom: 80px;
 }
 
@@ -324,11 +324,10 @@ body::before {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     /* 2 columns for mobile */
-    gap: 24px 16px;
+    gap: 16px 12px;
     max-width: 800px;
     margin: 0 auto;
     justify-items: center;
-    /* Center items in their cells */
 }
 
 @media (min-width: 600px) {
@@ -336,7 +335,7 @@ body::before {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 20px 16px;
         justify-items: start;
-        /* Reset for desktop */
+        padding: 20px;
     }
 }
 
@@ -344,19 +343,20 @@ body::before {
 .book-item {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     cursor: pointer;
     position: relative;
-    width: auto;
-    height: 280px;
-    /* Fixed height container */
-    max-width: 100%;
+    width: 100%;
+    height: 260px;
+    /* Reduced fixed height */
+    align-items: center;
 }
 
 @media (min-width: 600px) {
     .book-item {
         height: auto;
         width: 100%;
+        align-items: flex-start;
     }
 }
 
@@ -364,15 +364,18 @@ body::before {
 .book-cover-wrapper {
     position: relative;
     height: auto;
+    /* Let flex take over */
     flex: 1;
     width: auto;
     max-width: 100%;
     aspect-ratio: 2/3;
-    border-radius: 6px;
+    border-radius: 4px;
     overflow: hidden;
-    background: #f1f5f9;
+    background: transparent;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     transition: opacity 0.2s;
+    display: flex;
+    justify-content: center;
 }
 
 .book-item:active .book-cover-wrapper {
@@ -380,10 +383,13 @@ body::before {
 }
 
 .book-cover-wrapper img {
-    width: 100%;
+    width: auto;
     height: 100%;
-    object-fit: cover;
+    max-width: 100%;
+    object-fit: contain;
+    /* Prevent cropping */
     display: block;
+    margin: 0 auto;
 }
 
 /* Book Info (Title & Meta) */
@@ -391,10 +397,19 @@ body::before {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    width: 100%;
+    text-align: center;
+    /* Center text for mobile */
+}
+
+@media (min-width: 600px) {
+    .book-info {
+        text-align: left;
+    }
 }
 
 .book-title {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.3;
