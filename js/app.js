@@ -184,6 +184,7 @@ const App = {
     },
 
     switchView(viewName) {
+        console.log('Switching view to:', viewName);
         this.currentView = viewName;
 
         // DOM Elements
@@ -198,45 +199,42 @@ const App = {
         const activeNav = document.querySelector(`.nav-item[data-target="${viewName}"]`);
         if (activeNav) activeNav.classList.add('active');
 
+        // Helper to toggle visibility
+        const toggle = (el, show) => {
+            if (!el) return;
+            if (show) {
+                el.style.display = 'block';
+                el.classList.add('active');
+            } else {
+                el.style.display = 'none';
+                el.classList.remove('active');
+            }
+        };
+
         // Toggle Views
         if (viewName === 'home') {
-            if (filterArea) filterArea.style.display = 'none';
-            if (bookshelf) {
-                bookshelf.style.display = 'block';
-                bookshelf.classList.add('active');
-            }
-            if (personalView) personalView.style.display = 'none';
+            toggle(filterArea, false);
+            toggle(bookshelf, true);
+            toggle(personalView, false);
             if (bookCountTarget) bookCountTarget.style.display = 'block';
-
-            // Reset filter for home view? Or keep it?
-            // User might want to see "Reading" books on home.
-            // For now, let's keep the filter state but just hide the controls.
 
         } else if (viewName === 'search') {
-            if (filterArea) filterArea.style.display = 'block';
-            if (bookshelf) {
-                bookshelf.style.display = 'block';
-                bookshelf.classList.add('active');
-            }
-            if (personalView) personalView.style.display = 'none';
+            toggle(filterArea, true);
+            toggle(bookshelf, true);
+            toggle(personalView, false);
             if (bookCountTarget) bookCountTarget.style.display = 'block';
 
-            // Focus search input?
-            // document.getElementById('searchInput').focus();
-
         } else if (viewName === 'personal') {
-            if (filterArea) filterArea.style.display = 'none';
-            if (bookshelf) bookshelf.style.display = 'none';
-            if (personalView) {
-                personalView.style.display = 'block';
-                personalView.classList.add('active');
-            }
+            toggle(filterArea, false);
+            toggle(bookshelf, false);
+            toggle(personalView, true);
             if (bookCountTarget) bookCountTarget.style.display = 'none';
             this.updatePersonalStats();
         }
     },
 
     updatePersonalStats() {
+        if (!typeof DataManager === 'undefined') return;
         const books = DataManager.getAllBooks();
         const totalEl = document.getElementById('statTotalBooks');
         const finishedEl = document.getElementById('statFinishedBooks');
@@ -246,6 +244,11 @@ const App = {
     },
 
     loadBooks() {
+        console.log('Loading books...');
+        if (typeof DataManager === 'undefined') {
+            console.error('DataManager not found');
+            return;
+        }
         let books = DataManager.filterBooks(this.currentFilter);
 
         // Sort books
@@ -281,9 +284,14 @@ const App = {
             }
         });
 
-        UI.renderBooks(books);
-        const genres = DataManager.getAllGenres();
-        UI.renderGenreTabs(genres);
+        try {
+            UI.renderBooks(books);
+            const genres = DataManager.getAllGenres();
+            UI.renderGenreTabs(genres);
+        } catch (e) {
+            console.error('Error rendering books:', e);
+            UI.showToast('描画エラーが発生しました');
+        }
     },
 
     handleSearch() {
