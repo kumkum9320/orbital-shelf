@@ -4,6 +4,7 @@
 
 const App = {
     currentFilter: { status: 'all', genre: null, query: '', sort: 'updated_desc' },
+    currentView: 'home',
 
     async init() {
         // Make App globally available for inline event handlers
@@ -12,6 +13,9 @@ const App = {
         UI.init();
         this.bindEvents();
         this.registerServiceWorker();
+
+        // Initial View
+        this.switchView('home');
 
         // Wait for auth state
         const user = await AuthManager.init();
@@ -69,6 +73,7 @@ const App = {
             DataManager.localCache = [];
             this.loadBooks();
             this.showLoginOverlay();
+            this.switchView('home');
             UI.showToast('ログアウトしました');
         } catch (error) {
             console.error('Logout error:', error);
@@ -79,16 +84,33 @@ const App = {
         // Login button
         document.getElementById('btnGoogleLogin').addEventListener('click', () => this.handleLogin());
 
-        // Logout button
-        document.getElementById('btnLogout').addEventListener('click', () => {
-            if (confirm('ログアウトしますか？')) {
-                this.handleLogout();
-            }
-        });
+        // Personal View: Logout button
+        const btnPersonalLogout = document.getElementById('btnPersonalLogout');
+        if (btnPersonalLogout) {
+            btnPersonalLogout.addEventListener('click', () => {
+                if (confirm('ログアウトしますか？')) {
+                    this.handleLogout();
+                }
+            });
+        }
 
-        // Add button
-        document.getElementById('btnAdd').addEventListener('click', () => this.openAddModal());
-        document.getElementById('btnAddFirst').addEventListener('click', () => this.openAddModal());
+        // Footer Add button
+        const btnAddFooter = document.getElementById('btnAddFooter');
+        if (btnAddFooter) btnAddFooter.addEventListener('click', () => this.openAddModal());
+
+        // Add button (Header - kept for compatibility if needed, though hidden)
+        const btnAdd = document.getElementById('btnAdd');
+        if (btnAdd) btnAdd.addEventListener('click', () => this.openAddModal());
+        const btnAddFirst = document.getElementById('btnAddFirst');
+        if (btnAddFirst) btnAddFirst.addEventListener('click', () => this.openAddModal());
+
+        // Bottom Navigation
+        document.querySelectorAll('.bottom-nav .nav-item[data-target]').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const target = e.currentTarget.dataset.target;
+                this.switchView(target);
+            });
+        });
 
         // Modal controls - Add
         document.getElementById('btnCloseAdd').addEventListener('click', () => this.closeModal('modalAdd'));
@@ -143,16 +165,84 @@ const App = {
         document.getElementById('logForm').addEventListener('submit', (e) => this.handleLogSubmit(e));
 
         // AI Tag Assist Modal
-        document.getElementById('btnAITag').addEventListener('click', () => this.openAITagModal());
+        const btnPersonalAITag = document.getElementById('btnPersonalAITag');
+        if (btnPersonalAITag) btnPersonalAITag.addEventListener('click', () => this.openAITagModal());
+
+        // Old button compatibility
+        const btnAITag = document.getElementById('btnAITag');
+        if (btnAITag) btnAITag.addEventListener('click', () => this.openAITagModal());
+
         document.getElementById('btnCloseAITag').addEventListener('click', () => this.closeModal('modalAITag'));
         document.querySelector('#modalAITag .modal-overlay').addEventListener('click', () => this.closeModal('modalAITag'));
-        document.getElementById('btnCopyTagPrompt').addEventListener('click', () => this.copyTagPrompt());
         document.getElementById('btnApplyTags').addEventListener('click', () => this.applyAITags());
+        document.getElementById('btnCopyTagPrompt').addEventListener('click', () => this.copyTagPrompt());
 
         // Delete Confirmation Modal
         document.getElementById('btnCancelDelete').addEventListener('click', () => this.closeModal('modalDeleteConfirm'));
         document.getElementById('btnConfirmDelete').addEventListener('click', () => this.confirmDelete());
         document.querySelector('#modalDeleteConfirm .modal-overlay').addEventListener('click', () => this.closeModal('modalDeleteConfirm'));
+    },
+
+    switchView(viewName) {
+        this.currentView = viewName;
+
+        // DOM Elements
+        const filterArea = document.getElementById('searchFilterArea');
+        const bookshelf = document.getElementById('bookshelfContainer'); // Used for Home & Search
+        const personalView = document.getElementById('personalView');
+        const navItems = document.querySelectorAll('.nav-item[data-target]');
+        const bookCountTarget = document.getElementById('bookCount'); // Hide/Show book count?
+
+        // Reset Nav Active State
+        navItems.forEach(item => item.classList.remove('active'));
+        const activeNav = document.querySelector(`.nav-item[data-target="${viewName}"]`);
+        if (activeNav) activeNav.classList.add('active');
+
+        // Toggle Views
+        if (viewName === 'home') {
+            if (filterArea) filterArea.style.display = 'none';
+            if (bookshelf) {
+                bookshelf.style.display = 'block';
+                bookshelf.classList.add('active');
+            }
+            if (personalView) personalView.style.display = 'none';
+            if (bookCountTarget) bookCountTarget.style.display = 'block';
+
+            // Reset filter for home view? Or keep it?
+            // User might want to see "Reading" books on home.
+            // For now, let's keep the filter state but just hide the controls.
+
+        } else if (viewName === 'search') {
+            if (filterArea) filterArea.style.display = 'block';
+            if (bookshelf) {
+                bookshelf.style.display = 'block';
+                bookshelf.classList.add('active');
+            }
+            if (personalView) personalView.style.display = 'none';
+            if (bookCountTarget) bookCountTarget.style.display = 'block';
+
+            // Focus search input?
+            // document.getElementById('searchInput').focus();
+
+        } else if (viewName === 'personal') {
+            if (filterArea) filterArea.style.display = 'none';
+            if (bookshelf) bookshelf.style.display = 'none';
+            if (personalView) {
+                personalView.style.display = 'block';
+                personalView.classList.add('active');
+            }
+            if (bookCountTarget) bookCountTarget.style.display = 'none';
+            this.updatePersonalStats();
+        }
+    },
+
+    updatePersonalStats() {
+        const books = DataManager.getAllBooks();
+        const totalEl = document.getElementById('statTotalBooks');
+        const finishedEl = document.getElementById('statFinishedBooks');
+
+        if (totalEl) totalEl.textContent = books.length;
+        if (finishedEl) finishedEl.textContent = books.filter(b => b.status === 'finished').length;
     },
 
     loadBooks() {
@@ -202,6 +292,7 @@ const App = {
     },
 
     searchByKeyword(keyword) {
+        this.switchView('search');
         UI.elements.searchInput.value = keyword;
         this.handleSearch();
     },
