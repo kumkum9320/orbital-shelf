@@ -15,7 +15,6 @@ const UI = {
             bookshelfGrid: document.getElementById('bookshelfGrid'),
             bookshelfContainer: document.getElementById('bookshelfContainer'),
             emptyState: document.getElementById('emptyState'),
-            bookCount: document.getElementById('bookCount'),
             genreTags: document.getElementById('genreTags'),
             searchInput: document.getElementById('searchInput'),
             btnClearSearch: document.getElementById('btnClearSearch'),
@@ -38,12 +37,10 @@ const UI = {
 
         if (books.length === 0) {
             this.elements.emptyState.classList.add('visible');
-            this.elements.bookCount.textContent = '0 冊';
             return;
         }
 
         this.elements.emptyState.classList.remove('visible');
-        this.elements.bookCount.textContent = `${books.length} 冊`;
 
         books.forEach(book => {
             const bookItem = this.createBookItem(book);
