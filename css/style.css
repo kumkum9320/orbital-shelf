@@ -3,57 +3,54 @@
    =========================================== */
 
 /* ===== CSS Variables ===== */
+/* ===== CSS Variables ===== */
 :root {
-    /* Base Colors */
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #12121a;
-    --bg-card: rgba(255, 255, 255, 0.05);
-    --bg-glass: rgba(255, 255, 255, 0.08);
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.7);
-    --text-muted: rgba(255, 255, 255, 0.4);
-    --border-color: rgba(255, 255, 255, 0.1);
+    /* Base Colors - White Theme */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-glass: rgba(255, 255, 255, 0.8);
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --border-color: #e2e8f0;
     --accent: #6366f1;
-    --accent-glow: rgba(99, 102, 241, 0.4);
+    --accent-glow: rgba(99, 102, 241, 0.2);
 
-    /* Genre Colors - Vibrant Pastels */
-    --genre-mystery: #f472b6;
-    --genre-romance: #fb7185;
-    --genre-sf: #38bdf8;
-    --genre-horror: #a855f7;
-    --genre-history: #fbbf24;
-    --genre-lightnovel: #4ade80;
-    --genre-literature: #c084fc;
-    --genre-science: #22d3ee;
-    --genre-geography: #f59e0b;
-    --genre-politics: #ef4444;
-    --genre-business: #14b8a6;
-    --genre-tech: #60a5fa;
-    --genre-philosophy: #a78bfa;
-    --genre-selfhelp: #34d399;
-    --genre-lifestyle: #fb923c;
-    --genre-art: #e879f9;
-    --genre-sports: #10b981;
-    --genre-essay: #fcd34d;
-    --genre-nonfiction: #818cf8;
-    --genre-language: #2dd4bf;
-    --genre-picture: #fdba74;
-    --genre-manga: #f87171;
-    --genre-default: #94a3b8;
+    /* Genre Colors - Adjusted for Light Theme */
+    --genre-mystery: #db2777;
+    --genre-romance: #e11d48;
+    --genre-sf: #0284c7;
+    --genre-horror: #7e22ce;
+    --genre-history: #b45309;
+    --genre-lightnovel: #16a34a;
+    --genre-literature: #9333ea;
+    --genre-science: #0891b2;
+    --genre-geography: #d97706;
+    --genre-politics: #dc2626;
+    --genre-business: #0d9488;
+    --genre-tech: #2563eb;
+    --genre-philosophy: #7c3aed;
+    --genre-selfhelp: #059669;
+    --genre-lifestyle: #ea580c;
+    --genre-art: #c026d3;
+    --genre-sports: #059669;
+    --genre-essay: #d97706;
+    --genre-nonfiction: #4f46e5;
+    --genre-language: #0d9488;
+    --genre-picture: #ea580c;
+    --genre-manga: #ef4444;
+    --genre-default: #64748b;
 
     /* Spacing */
     --header-height: 60px;
+    --header-safe-area: env(safe-area-inset-top, 20px);
     --filter-height: 140px;
 
     /* Animation */
     --transition-fast: 150ms ease;
     --transition-normal: 300ms ease;
     --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
-
-    /* Orbital Settings */
-    --orbital-radius: 800px;
-    --card-width: 320px;
-    --card-height: 180px;
 }
 
 /* ===== Reset & Base ===== */
@@ -80,19 +77,9 @@ body {
     position: relative;
 }
 
-/* Background Gradient */
+/* Background - Clean White */
 body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background:
-        radial-gradient(ellipse 80% 50% at 80% 50%, rgba(99, 102, 241, 0.15), transparent),
-        radial-gradient(ellipse 60% 80% at 20% 80%, rgba(139, 92, 246, 0.1), transparent);
-    pointer-events: none;
-    z-index: -1;
+    display: none;
 }
 
 /* ===== Header ===== */
@@ -101,12 +88,14 @@ body::before {
     top: 0;
     left: 0;
     right: 0;
-    height: var(--header-height);
+    height: calc(var(--header-height) + var(--header-safe-area));
+    padding-top: var(--header-safe-area);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
-    background: rgba(10, 10, 15, 0.8);
+    padding-left: 20px;
+    padding-right: 20px;
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border-color);
@@ -124,20 +113,29 @@ body::before {
 
 .btn-icon {
     width: 44px;
+    -webkit-text-fill-color: var(--accent);
+    background-clip: text;
+    color: var(--accent);
+}
+
+.btn-icon {
+    width: 44px;
     height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--bg-glass);
-    border: 1px solid var(--border-color);
+    background: transparent;
+    border: 1px solid transparent;
     border-radius: 12px;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     cursor: pointer;
     transition: var(--transition-fast);
 }
 
 .btn-icon:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: var(--bg-glass);
+    color: var(--text-primary);
+    border-color: var(--border-color);
     transform: scale(1.05);
 }
 
@@ -148,14 +146,15 @@ body::before {
 /* ===== Filters Section ===== */
 .filters-section {
     position: fixed;
-    top: var(--header-height);
+    top: calc(var(--header-height) + var(--header-safe-area));
     left: 0;
     right: 0;
-    padding: 12px 16px;
-    background: rgba(10, 10, 15, 0.6);
+    padding: 12px 16px 4px;
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     z-index: 90;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .search-box {
@@ -293,7 +292,7 @@ body::before {
 /* ===== Bookshelf Grid Container ===== */
 .bookshelf-container {
     position: fixed;
-    top: calc(var(--header-height) + var(--filter-height));
+    top: calc(var(--header-height) + var(--filter-height) + var(--header-safe-area));
     left: 0;
     right: 0;
     bottom: 0;
@@ -348,7 +347,7 @@ body::before {
     width: 8px;
     background: var(--spine-color, var(--accent));
     border-radius: 4px 0 0 4px;
-    box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.3);
+    box-shadow: inset -2px 0 4px rgba(0, 0, 0, 0.1);
     z-index: 1;
 }
 
@@ -359,17 +358,18 @@ body::before {
     height: 100%;
     border-radius: 4px 8px 8px 4px;
     overflow: hidden;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
     box-shadow:
-        4px 4px 12px rgba(0, 0, 0, 0.4),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        4px 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        0 0 0 1px rgba(0, 0, 0, 0.05);
     transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .book-item:hover .book-cover-wrapper {
     box-shadow:
-        8px 12px 24px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        8px 12px 24px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
     transform: rotateY(-5deg);
 }
 
@@ -385,6 +385,7 @@ body::before {
 }
 
 /* Cover Placeholder for books without images */
+/* Cover Placeholder for books without images */
 .cover-placeholder {
     width: 100%;
     height: 100%;
@@ -393,13 +394,14 @@ body::before {
     justify-content: center;
     padding: 10px;
     text-align: center;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
 }
 
 .cover-text {
     font-size: 0.85rem;
     font-weight: 600;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    color: var(--text-secondary);
+    text-shadow: none;
     word-break: break-all;
     line-height: 1.2;
 }
@@ -411,7 +413,7 @@ body::before {
     left: 0;
     right: 0;
     height: 24px;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.8), transparent);
+    background: linear-gradient(0deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0));
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -425,15 +427,15 @@ body::before {
     left: 0;
     height: 4px;
     width: var(--progress, 0%);
-    background: linear-gradient(90deg, #22c55e, #4ade80);
+    background: linear-gradient(90deg, #10b981, #34d399);
     border-radius: 0 2px 0 0;
 }
 
 .reading-progress .progress-text {
     font-size: 0.65rem;
-    font-weight: 600;
-    color: #4ade80;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    font-weight: 700;
+    color: #059669;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 1);
 }
 
 /* Status Indicator */
@@ -442,7 +444,7 @@ body::before {
     top: 4px;
     right: 4px;
     font-size: 1rem;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 1px 2px rgba(255, 255, 255, 0.8));
 }
 
 /* Ownership Badge */
@@ -452,10 +454,11 @@ body::before {
     left: 8px;
     font-size: 0.6rem;
     padding: 2px 6px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
     border-radius: 4px;
-    font-weight: 500;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Book Tooltip */
@@ -467,8 +470,9 @@ body::before {
     width: max-content;
     max-width: 180px;
     padding: 8px 12px;
-    background: var(--bg-secondary);
+    background: white;
     border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     opacity: 0;
     pointer-events: none;
@@ -534,13 +538,14 @@ body::before {
     bottom: 20px;
     left: 20px;
     padding: 8px 16px;
-    background: var(--bg-glass);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 20px;
     font-size: 0.85rem;
     color: var(--text-secondary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     z-index: 80;
 }
 
@@ -567,8 +572,8 @@ body::before {
 .modal-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(2px);
     opacity: 0;
     transition: opacity var(--transition-normal);
 }
@@ -582,11 +587,12 @@ body::before {
     width: 100%;
     max-width: 480px;
     max-height: 90vh;
-    background: var(--bg-secondary);
+    background: white;
     border-radius: 24px 24px 0 0;
     overflow: hidden;
     transform: translateY(100%);
     transition: transform var(--transition-slow);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.1);
 }
 
 .modal.open .modal-content {
