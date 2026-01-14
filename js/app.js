@@ -559,6 +559,16 @@ const App = {
         const book = DataManager.getBook(bookId);
         if (!book) return;
 
+        // Immersive Background Setup
+        const modalContent = document.querySelector('#modalDetail .modal-content');
+        if (book.coverUrl) {
+            modalContent.style.setProperty('--book-cover', `url(${book.coverUrl})`);
+            modalContent.classList.add('has-cover-bg');
+        } else {
+            modalContent.style.removeProperty('--book-cover');
+            modalContent.classList.remove('has-cover-bg');
+        }
+
         const body = document.getElementById('detailBody');
         const progress = DataManager.getProgress(book);
         const remaining = book.totalPages ? book.totalPages - book.currentPage : 0;
@@ -579,20 +589,20 @@ const App = {
             `<span class="star ${i <= rating ? 'filled' : ''}" data-value="${i}">★</span>`
         ).join('');
 
-        // Ownership display
+        // Ownership display (English)
         const ownershipLabels = {
-            'owned': '📚 所有',
-            'borrowed': '📖 借りている',
-            'digital': '📱 電子書籍',
-            '': '未設定'
+            'owned': 'Owned',
+            'borrowed': 'Borrowed',
+            'digital': 'Digital',
+            '': 'Unset'
         };
         const ownershipText = ownershipLabels[book.ownership || ''];
 
-        // Status display
+        // Status display (English)
         const statusLabels = {
-            'reading': '📖 読書中',
-            'finished': '✅ 読了',
-            'wish': '⭐ 買いたい'
+            'reading': 'Reading',
+            'finished': 'Finished',
+            'wish': 'Wish'
         };
         const statusText = statusLabels[book.status] || '';
 
@@ -604,17 +614,17 @@ const App = {
                     ${log.memo ? `<div class="log-memo">${log.memo}</div>` : ''}
                 </div>
             </div>
-        `).join('') || '<p class="notes-empty">ログなし</p>';
+        `).join('') || '<p class="notes-empty">No logs</p>';
 
         let wishLinks = '';
         if (book.status === 'wish') {
             const searchQuery = encodeURIComponent(book.title + ' ' + book.author);
             wishLinks = `
                 <div class="detail-section">
-                    <h4>🛒 購入リンク</h4>
+                    <h4>Purchase Links</h4>
                     <div class="external-links">
                         <a href="https://www.amazon.co.jp/s?k=${searchQuery}" target="_blank" class="external-link amazon">Amazon</a>
-                        <a href="https://jp.mercari.com/search?keyword=${searchQuery}" target="_blank" class="external-link mercari">メルカリ</a>
+                        <a href="https://jp.mercari.com/search?keyword=${searchQuery}" target="_blank" class="external-link mercari">Mercari</a>
                         <a href="https://www.valuebooks.jp/shelf-items/list?search=${searchQuery}" target="_blank" class="external-link vb">ValueBooks</a>
                     </div>
                 </div>
@@ -626,7 +636,7 @@ const App = {
                 <div class="detail-cover">${coverHtml}</div>
                 <div class="detail-meta">
                     <h3>${book.title}</h3>
-                    <p class="author">${book.author || '著者不明'}</p>
+                    <p class="author">${book.author || 'Unknown Author'}</p>
                     <p class="publisher">${book.publisher || ''} ${book.isbn ? '/ ' + book.isbn : ''}</p>
                     <div class="detail-tags">${tagsHtml}</div>
                 </div>
@@ -634,22 +644,22 @@ const App = {
             
             <div class="detail-info-grid">
                 <div class="info-item">
-                    <label>ステータス</label>
+                    <label>Status</label>
                     <span class="status-value ${book.status}">${statusText}</span>
                 </div>
                 <div class="info-item">
-                    <label>所有形態</label>
+                    <label>Ownership</label>
                     <span>${ownershipText}</span>
                 </div>
                 <div class="info-item rating-item">
-                    <label>評価</label>
+                    <label>Rating</label>
                     <div class="star-rating" data-book-id="${book.id}">${starsHtml}</div>
                 </div>
             </div>
             
             ${book.status === 'reading' || book.status === 'finished' ? `
             <div class="detail-section">
-                <h4>📊 進捗</h4>
+                <h4>Progress</h4>
                 <div class="progress-display">
                     <div class="progress-circle" style="--progress: ${progress}">
                         <svg width="60" height="60">
@@ -659,8 +669,8 @@ const App = {
                         <span class="progress-text">${progress}%</span>
                     </div>
                     <div class="progress-info">
-                        <div class="pages">${book.currentPage} / ${book.totalPages || '?'} ページ</div>
-                        <div class="remaining">${remaining > 0 ? `残り ${remaining} ページ` : '🎉 読了！'}</div>
+                        <div class="pages">${book.currentPage} / ${book.totalPages || '?'} p</div>
+                        <div class="remaining">${remaining > 0 ? `${remaining} pages left` : 'Completed!'}</div>
                     </div>
                 </div>
             </div>
@@ -669,32 +679,32 @@ const App = {
             ${wishLinks}
             
             <div class="detail-section">
-                <h4>🎯 アクション</h4>
+                <h4>Actions</h4>
                 <div class="detail-actions">
-                    ${book.status === 'reading' ? `<button class="action-btn primary" onclick="App.openLogModal('${book.id}')">📝 読書記録</button>` : ''}
+                    ${book.status === 'reading' ? `<button class="action-btn primary" onclick="App.openLogModal('${book.id}')">Record Log</button>` : ''}
                     ${book.status === 'wish' ? `
-                        <button class="action-btn success" onclick="App.changeStatus('${book.id}', 'reading', 'owned')">📚 購入して読む</button>
-                        <button class="action-btn" onclick="App.changeStatus('${book.id}', 'reading', 'borrowed')">📖 借りて読む</button>
+                        <button class="action-btn success" onclick="App.changeStatus('${book.id}', 'reading', 'owned')">Purchase & Read</button>
+                        <button class="action-btn" onclick="App.changeStatus('${book.id}', 'reading', 'borrowed')">Borrow & Read</button>
                     ` : ''}
-                    ${book.status === 'reading' ? `<button class="action-btn success" onclick="App.changeStatus('${book.id}', 'finished')">✅ 読了にする</button>` : ''}
-                    ${book.status === 'finished' ? `<button class="action-btn" onclick="App.changeStatus('${book.id}', 'reading')">📖 再読する</button>` : ''}
-                    <button class="action-btn" onclick="App.openAddModal('${book.id}')">✏️ 編集</button>
-                    <button class="action-btn danger" onclick="App.deleteBook('${book.id}')">🗑️ 削除</button>
+                    ${book.status === 'reading' ? `<button class="action-btn success" onclick="App.changeStatus('${book.id}', 'finished')">Mark Finished</button>` : ''}
+                    ${book.status === 'finished' ? `<button class="action-btn" onclick="App.changeStatus('${book.id}', 'reading')">Read Again</button>` : ''}
+                    <button class="action-btn" onclick="App.openAddModal('${book.id}')">Edit</button>
+                    <button class="action-btn danger" onclick="App.deleteBook('${book.id}')">Delete</button>
                 </div>
             </div>
             
             <div class="detail-section">
-                <h4>📓 読書ログ</h4>
+                <h4>Reading Log</h4>
                 <div class="reading-log">${logsHtml}</div>
             </div>
             
             <div class="detail-section">
-                <h4>💭 感想・メモ</h4>
+                <h4>Notes</h4>
                 <div class="notes-content" id="notesContent" contenteditable="false">
-                    ${book.notes || '<span class="notes-empty">タップして感想を追加...</span>'}
+                    ${book.notes || '<span class="notes-empty">Tap to add notes...</span>'}
                 </div>
                 <div class="notes-actions">
-                    <button class="btn-edit-notes" onclick="App.toggleNotesEdit('${book.id}')">✏️ 編集</button>
+                    <button class="btn-edit-notes" onclick="App.toggleNotesEdit('${book.id}')">Edit Note</button>
                 </div>
             </div>
         `;
