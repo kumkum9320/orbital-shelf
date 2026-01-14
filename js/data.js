@@ -1,9 +1,11 @@
 /**
- * Orbital Shelf - Data Management Module
+ * Orbital Shelf - Data Management Module (Firebase Firestore版)
  */
 
 const DataManager = {
     STORAGE_KEY: 'orbital_shelf_books',
+    localCache: [],
+    isOnline: false,
 
     genreColors: {
         'ミステリー': 'var(--genre-mystery)',
@@ -37,36 +39,71 @@ const DataManager = {
         'エッセイ', 'ノンフィクション', '語学', '絵本', '漫画'
     ],
 
+    // Firestore collection reference
+    getBooksCollection() {
+        const userId = AuthManager.getUserId();
+        if (!userId) return null;
+        return db.collection('users').doc(userId).collection('books');
+    },
+
     generateId() {
         return 'book_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     },
 
+    // Get all books (from Firestore if online, otherwise from local cache)
     getAllBooks() {
+        return this.localCache;
+    },
+
+    // Load books from Firestore
+    async loadFromFirestore() {
+        const collection = this.getBooksCollection();
+        if (!collection) {
+            this.isOnline = false;
+            return this.loadFromLocal();
+        }
+
+        try {
+            const snapshot = await collection.orderBy('createdAt', 'desc').get();
+            this.localCache = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            this.saveToLocal(); // Cache locally
+            this.isOnline = true;
+            console.log('Loaded', this.localCache.length, 'books from Firestore');
+            return this.localCache;
+        } catch (error) {
+            console.error('Firestore load error:', error);
+            return this.loadFromLocal();
+        }
+    },
+
+    // Load from local storage (fallback)
+    loadFromLocal() {
         try {
             const data = localStorage.getItem(this.STORAGE_KEY);
-            return data ? JSON.parse(data) : [];
+            this.localCache = data ? JSON.parse(data) : [];
+            this.isOnline = false;
+            return this.localCache;
         } catch (e) {
-            console.error('Error reading from localStorage:', e);
+            console.error('LocalStorage load error:', e);
+            this.localCache = [];
             return [];
         }
     },
 
-    saveAllBooks(books) {
+    // Save to local storage
+    saveToLocal() {
         try {
-            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(books));
-            return true;
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.localCache));
         } catch (e) {
-            console.error('Error saving to localStorage:', e);
-            return false;
+            console.error('LocalStorage save error:', e);
         }
     },
 
     getBook(id) {
-        return this.getAllBooks().find(book => book.id === id);
+        return this.localCache.find(book => book.id === id);
     },
 
-    addBook(bookData) {
-        const books = this.getAllBooks();
+    async addBook(bookData) {
         const newBook = {
             id: this.generateId(),
             title: bookData.title || '',
@@ -77,56 +114,105 @@ const DataManager = {
             isbn: bookData.isbn || '',
             status: bookData.status || 'wish',
             ownership: bookData.ownership || '',
-            tags: Array.isArray(bookData.tags) ? bookData.tags : 
-                  (bookData.tags ? bookData.tags.split(',').map(t => t.trim()).filter(t => t) : []),
+            tags: Array.isArray(bookData.tags) ? bookData.tags :
+                (bookData.tags ? bookData.tags.split(',').map(t => t.trim()).filter(t => t) : []),
             coverUrl: bookData.coverUrl || '',
             notes: bookData.notes || '',
             readingLogs: bookData.readingLogs || [],
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
-        books.unshift(newBook);
-        this.saveAllBooks(books);
+
+        // Add to local cache first
+        this.localCache.unshift(newBook);
+        this.saveToLocal();
+
+        // Sync to Firestore
+        const collection = this.getBooksCollection();
+        if (collection) {
+            try {
+                await collection.doc(newBook.id).set(newBook);
+                console.log('Book saved to Firestore:', newBook.title);
+            } catch (error) {
+                console.error('Firestore save error:', error);
+            }
+        }
+
         return newBook;
     },
 
-    updateBook(id, updates) {
-        const books = this.getAllBooks();
-        const index = books.findIndex(book => book.id === id);
+    async updateBook(id, updates) {
+        const index = this.localCache.findIndex(book => book.id === id);
         if (index === -1) return null;
+
         if (updates.tags && typeof updates.tags === 'string') {
             updates.tags = updates.tags.split(',').map(t => t.trim()).filter(t => t);
         }
-        books[index] = { ...books[index], ...updates, updatedAt: new Date().toISOString() };
-        this.saveAllBooks(books);
-        return books[index];
+
+        const updatedBook = {
+            ...this.localCache[index],
+            ...updates,
+            updatedAt: new Date().toISOString()
+        };
+
+        this.localCache[index] = updatedBook;
+        this.saveToLocal();
+
+        // Sync to Firestore
+        const collection = this.getBooksCollection();
+        if (collection) {
+            try {
+                await collection.doc(id).update(updates);
+            } catch (error) {
+                console.error('Firestore update error:', error);
+            }
+        }
+
+        return updatedBook;
     },
 
-    deleteBook(id) {
-        const books = this.getAllBooks();
-        const filtered = books.filter(book => book.id !== id);
-        if (filtered.length === books.length) return false;
-        this.saveAllBooks(filtered);
+    async deleteBook(id) {
+        const filtered = this.localCache.filter(book => book.id !== id);
+        if (filtered.length === this.localCache.length) return false;
+
+        this.localCache = filtered;
+        this.saveToLocal();
+
+        // Sync to Firestore
+        const collection = this.getBooksCollection();
+        if (collection) {
+            try {
+                await collection.doc(id).delete();
+                console.log('Book deleted from Firestore');
+            } catch (error) {
+                console.error('Firestore delete error:', error);
+            }
+        }
+
         return true;
     },
 
-    addReadingLog(bookId, logEntry) {
+    async addReadingLog(bookId, logEntry) {
         const book = this.getBook(bookId);
         if (!book) return null;
+
         const log = {
             date: new Date().toISOString().split('T')[0],
             page: parseInt(logEntry.page) || 0,
             memo: logEntry.memo || ''
         };
+
         book.readingLogs = book.readingLogs || [];
         book.readingLogs.unshift(log);
         book.currentPage = log.page;
+
         if (book.totalPages && log.page >= book.totalPages) {
             book.status = 'finished';
         } else if (log.page > 0 && book.status === 'wish') {
             book.status = 'reading';
         }
-        return this.updateBook(bookId, {
+
+        return await this.updateBook(bookId, {
             readingLogs: book.readingLogs,
             currentPage: book.currentPage,
             status: book.status
@@ -134,18 +220,16 @@ const DataManager = {
     },
 
     getAllTags() {
-        const books = this.getAllBooks();
         const tagSet = new Set();
-        books.forEach(book => {
+        this.localCache.forEach(book => {
             if (Array.isArray(book.tags)) book.tags.forEach(tag => tagSet.add(tag));
         });
         return Array.from(tagSet);
     },
 
     getAllGenres() {
-        const books = this.getAllBooks();
         const genreSet = new Set();
-        books.forEach(book => {
+        this.localCache.forEach(book => {
             if (Array.isArray(book.tags) && book.tags.length > 0) genreSet.add(book.tags[0]);
         });
         return Array.from(genreSet);
@@ -161,7 +245,7 @@ const DataManager = {
     },
 
     filterBooks(criteria = {}) {
-        let books = this.getAllBooks();
+        let books = this.localCache;
         if (criteria.status && criteria.status !== 'all') {
             books = books.filter(book => book.status === criteria.status);
         }
@@ -170,7 +254,7 @@ const DataManager = {
         }
         if (criteria.query) {
             const q = criteria.query.toLowerCase();
-            books = books.filter(book => 
+            books = books.filter(book =>
                 book.title.toLowerCase().includes(q) ||
                 book.author.toLowerCase().includes(q) ||
                 (Array.isArray(book.tags) && book.tags.some(tag => tag.toLowerCase().includes(q)))
@@ -209,14 +293,40 @@ const DataManager = {
         }
     },
 
+    // Migrate local data to Firestore (for first-time sync)
+    async migrateLocalToFirestore() {
+        const collection = this.getBooksCollection();
+        if (!collection) return;
+
+        const localData = localStorage.getItem(this.STORAGE_KEY);
+        if (!localData) return;
+
+        const localBooks = JSON.parse(localData);
+        if (localBooks.length === 0) return;
+
+        // Check if Firestore already has data
+        const snapshot = await collection.limit(1).get();
+        if (!snapshot.empty) {
+            console.log('Firestore already has data, skipping migration');
+            return;
+        }
+
+        // Migrate local books to Firestore
+        console.log('Migrating', localBooks.length, 'books to Firestore...');
+        for (const book of localBooks) {
+            try {
+                await collection.doc(book.id).set(book);
+            } catch (error) {
+                console.error('Migration error for book:', book.title, error);
+            }
+        }
+        console.log('Migration complete!');
+    },
+
     initializeSampleData() {
-        if (this.getAllBooks().length > 0) return;
-        const sampleBooks = [
-            { title: 'ノルウェイの森', author: '村上春樹', publisher: '講談社', totalPages: 464, currentPage: 120, isbn: '9784062748681', status: 'reading', ownership: 'owned', tags: ['文芸', '恋愛', 'ベストセラー'], readingLogs: [{ date: '2026-01-13', page: 120, memo: '静かな雰囲気がいい' }] },
-            { title: '容疑者Xの献身', author: '東野圭吾', publisher: '文藝春秋', totalPages: 394, currentPage: 394, isbn: '9784167110123', status: 'finished', ownership: 'owned', tags: ['ミステリー', '直木賞'], notes: '天才数学者の献身的な愛に感動' },
-            { title: '三体', author: '劉慈欣, 大森望 (訳)', publisher: '早川書房', totalPages: 424, currentPage: 0, isbn: '9784150121570', status: 'wish', tags: ['SF', '中国文学', 'ヒューゴー賞'] }
-        ];
-        sampleBooks.forEach(book => this.addBook(book));
+        // Only initialize sample data if completely empty
+        if (this.localCache.length > 0) return;
+        // Sample data will be loaded from Firestore if available
     }
 };
 

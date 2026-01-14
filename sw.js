@@ -1,8 +1,9 @@
-const CACHE_NAME = 'orbital-shelf-v2';
+const CACHE_NAME = 'orbital-shelf-v3';
 const ASSETS = [
     '/',
     '/index.html',
     '/css/style.css',
+    '/js/firebase-config.js',
     '/js/data.js',
     '/js/api.js',
     '/js/ui.js',

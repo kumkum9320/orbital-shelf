@@ -5,15 +5,77 @@
 const App = {
     currentFilter: { status: 'all', genre: null, query: '' },
 
-    init() {
-        DataManager.initializeSampleData();
+    async init() {
         UI.init();
         this.bindEvents();
-        this.loadBooks();
         this.registerServiceWorker();
+
+        // Wait for auth state
+        const user = await AuthManager.init();
+
+        if (user) {
+            // User is logged in
+            this.hideLoginOverlay();
+            await this.initializeWithUser();
+        } else {
+            // Show login screen
+            this.showLoginOverlay();
+        }
+    },
+
+    async initializeWithUser() {
+        // Migrate local data if exists
+        await DataManager.migrateLocalToFirestore();
+        // Load books from Firestore
+        await DataManager.loadFromFirestore();
+        this.loadBooks();
+        this.updateUserInfo();
+    },
+
+    showLoginOverlay() {
+        document.getElementById('loginOverlay').classList.add('visible');
+    },
+
+    hideLoginOverlay() {
+        document.getElementById('loginOverlay').classList.remove('visible');
+    },
+
+    updateUserInfo() {
+        const user = AuthManager.getUser();
+        if (user) {
+            // Could add user avatar/name to header if desired
+            console.log('Logged in as:', user.displayName);
+        }
+    },
+
+    async handleLogin() {
+        try {
+            await AuthManager.signInWithGoogle();
+            this.hideLoginOverlay();
+            await this.initializeWithUser();
+            UI.showToast('ログインしました');
+        } catch (error) {
+            console.error('Login error:', error);
+            UI.showToast('ログインに失敗しました');
+        }
+    },
+
+    async handleLogout() {
+        try {
+            await AuthManager.signOut();
+            DataManager.localCache = [];
+            this.loadBooks();
+            this.showLoginOverlay();
+            UI.showToast('ログアウトしました');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
     },
 
     bindEvents() {
+        // Login button
+        document.getElementById('btnGoogleLogin').addEventListener('click', () => this.handleLogin());
+
         // Add button
         document.getElementById('btnAdd').addEventListener('click', () => this.openAddModal());
         document.getElementById('btnAddFirst').addEventListener('click', () => this.openAddModal());
