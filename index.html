@@ -57,12 +57,24 @@
             <button class="btn-clear" id="btnClearSearch" aria-label="クリア">×</button>
         </div>
 
-        <!-- Status Tabs -->
-        <div class="status-tabs" id="statusTabs">
-            <button class="tab active" data-status="all">All</button>
-            <button class="tab" data-status="reading">Reading</button>
-            <button class="tab" data-status="finished">Finished</button>
-            <button class="tab" data-status="wish">Wish</button>
+        <div class="filter-controls-row">
+            <!-- Status Tabs -->
+            <div class="status-tabs" id="statusTabs">
+                <button class="tab active" data-status="all">すべて</button>
+                <button class="tab" data-status="reading">読書中</button>
+                <button class="tab" data-status="finished">完読</button>
+                <button class="tab" data-status="wish">読みたい</button>
+            </div>
+
+            <!-- Sort Select -->
+            <div class="sort-control">
+                <select id="sortSelect" class="sort-select" aria-label="並べ替え">
+                    <option value="updated_desc">更新: 新しい順</option>
+                    <option value="updated_asc">更新: 古い順</option>
+                    <option value="created_desc">登録: 新しい順</option>
+                    <option value="created_asc">登録: 古い順</option>
+                </select>
+            </div>
         </div>
 
         <!-- Genre Tags (auto-generated) -->

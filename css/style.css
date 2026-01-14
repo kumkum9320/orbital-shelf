@@ -235,18 +235,52 @@ body::before {
     color: var(--text-primary);
 }
 
+/* Filter Controls Row */
+.filter-controls-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
 /* Status Tabs */
 .status-tabs {
     display: flex;
     gap: 8px;
-    margin-bottom: 12px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    flex: 1;
+    /* Take available space */
+    padding-right: 4px;
+    /* Optional padding */
 }
 
 .status-tabs::-webkit-scrollbar {
     display: none;
+}
+
+.sort-control {
+    flex-shrink: 0;
+}
+
+.sort-select {
+    height: 38px;
+    /* Match tab height roughly */
+    padding: 0 12px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.sort-select:hover {
+    background: rgba(255, 255, 255, 0.5);
+    border-color: var(--text-muted);
 }
 
 .tab {
@@ -320,64 +354,76 @@ body::before {
     padding-bottom: 80px;
 }
 
+
+/* List layout for mobile, Grid for desktop */
 .bookshelf-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* Use minmax(0, 1fr) to prevent overflow */
-    gap: 16px 12px;
+    grid-template-columns: 1fr;
+    /* Single column list for mobile */
+    gap: 16px;
     max-width: 800px;
-    width: 100%;
-    /* Ensure it fits container */
     margin: 0 auto;
-    justify-items: center;
 }
 
 @media (min-width: 600px) {
     .bookshelf-grid {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 20px 16px;
-        justify-items: start;
         padding: 20px;
     }
 }
 
-/* Book Item (Flat Style) */
+
+/* Book Item */
 .book-item {
     display: flex;
-    flex-direction: column;
-    gap: 6px;
+    flex-direction: row;
+    /* Row layout for list view */
+    gap: 12px;
     cursor: pointer;
     position: relative;
     width: 100%;
-    height: 260px;
-    /* Reduced fixed height */
-    align-items: center;
+    height: auto;
+    align-items: flex-start;
+    background: white;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.book-item:last-child {
+    border-bottom: none;
 }
 
 @media (min-width: 600px) {
     .book-item {
+        flex-direction: column;
+        /* Column layout for grid view */
         height: auto;
-        width: 100%;
-        align-items: flex-start;
+        gap: 8px;
+        border-bottom: none;
+        padding-bottom: 0;
     }
 }
 
 /* Book Cover Wrapper */
 .book-cover-wrapper {
     position: relative;
-    height: auto;
-    /* Let flex take over */
-    flex: 1;
-    width: auto;
-    max-width: 100%;
+    flex: 0 0 90px;
+    /* Fixed width for list view cover */
+    width: 90px;
     aspect-ratio: 2/3;
     border-radius: 4px;
     overflow: hidden;
-    background: transparent;
+    background: #f1f5f9;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: opacity 0.2s;
-    display: flex;
-    justify-content: center;
+}
+
+@media (min-width: 600px) {
+    .book-cover-wrapper {
+        flex: 1;
+        width: 100%;
+        max-width: 100%;
+    }
 }
 
 .book-item:active .book-cover-wrapper {
@@ -385,33 +431,27 @@ body::before {
 }
 
 .book-cover-wrapper img {
-    width: auto;
+    width: 100%;
     height: 100%;
-    max-width: 100%;
-    object-fit: contain;
-    /* Prevent cropping */
+    object-fit: cover;
+    /* Cover is fine for list view thumbnails */
     display: block;
-    margin: 0 auto;
 }
 
 /* Book Info (Title & Meta) */
 .book-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    width: 100%;
-    text-align: center;
-    /* Center text for mobile */
-}
-
-@media (min-width: 600px) {
-    .book-info {
-        text-align: left;
-    }
+    gap: 4px;
+    flex: 1;
+    text-align: left;
+    /* Left align for list view */
+    justify-content: center;
+    min-width: 0;
 }
 
 .book-title {
-    font-size: 0.75rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.3;
@@ -420,14 +460,16 @@ body::before {
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-    height: 2.6em;
+    margin-bottom: 2px;
+    height: auto;
 }
 
 .book-meta {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
+    /* Slightly larger */
     color: var(--text-secondary);
 }
 
@@ -436,6 +478,76 @@ body::before {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+}
+
+.clickable {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.clickable:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+/* Tags List */
+.book-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.mini-tag {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Progress Bar in List */
+.reading-progress-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    width: 100%;
+}
+
+.reading-progress-bar-list {
+    flex: 1;
+    height: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-percentage {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    width: 3em;
+    text-align: right;
+}
+
+/* Status Badge position for list view */
+.status-badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 4px 0 6px 0;
+    z-index: 5;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 600px) {
+    .book-title {
+        font-size: 0.85rem;
+        height: 2.6em;
+    }
 }
 
 /* Status Badge (Ribbon Style) */

@@ -3,9 +3,12 @@
  */
 
 const App = {
-    currentFilter: { status: 'all', genre: null, query: '' },
+    currentFilter: { status: 'all', genre: null, query: '', sort: 'updated_desc' },
 
     async init() {
+        // Make App globally available for inline event handlers
+        window.App = this;
+
         UI.init();
         this.bindEvents();
         this.registerServiceWorker();
@@ -106,6 +109,15 @@ const App = {
             tab.addEventListener('click', () => this.filterByStatus(tab.dataset.status));
         });
 
+        // Sort select
+        const sortSelect = document.getElementById('sortSelect');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', (e) => {
+                this.currentFilter.sort = e.target.value;
+                this.loadBooks();
+            });
+        }
+
         // Book form
         document.getElementById('bookForm').addEventListener('submit', (e) => this.handleBookSubmit(e));
 
@@ -144,7 +156,41 @@ const App = {
     },
 
     loadBooks() {
-        const books = DataManager.filterBooks(this.currentFilter);
+        let books = DataManager.filterBooks(this.currentFilter);
+
+        // Sort books
+        const sortType = this.currentFilter.sort || 'updated_desc';
+        books.sort((a, b) => {
+            let valA, valB;
+            // Use updatedAt or createdAt or id (timestamp)
+            const getTimestamp = (book) => {
+                // If we had proper timestamps in Firestore, we'd use them.
+                // For now, fallback to string comparison or id (which might be timestamp-based or random)
+                // Assuming newer IDs or updatedAt strings are larger/later.
+                return book.updatedAt || book.createdAt || book.id;
+            };
+
+            switch (sortType) {
+                case 'created_asc':
+                    valA = a.createdAt || a.id;
+                    valB = b.createdAt || b.id;
+                    return valA > valB ? 1 : -1;
+                case 'created_desc':
+                    valA = a.createdAt || a.id;
+                    valB = b.createdAt || b.id;
+                    return valA < valB ? 1 : -1;
+                case 'updated_asc':
+                    valA = getTimestamp(a);
+                    valB = getTimestamp(b);
+                    return valA > valB ? 1 : -1;
+                case 'updated_desc':
+                default:
+                    valA = getTimestamp(a);
+                    valB = getTimestamp(b);
+                    return valA < valB ? 1 : -1;
+            }
+        });
+
         UI.renderBooks(books);
         const genres = DataManager.getAllGenres();
         UI.renderGenreTabs(genres);
@@ -158,6 +204,11 @@ const App = {
     searchByKeyword(keyword) {
         UI.elements.searchInput.value = keyword;
         this.handleSearch();
+    },
+
+    // Public search method called from UI clicks
+    search(term) {
+        this.searchByKeyword(term);
     },
 
     filterByStatus(status) {

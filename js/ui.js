@@ -78,24 +78,52 @@ const UI = {
             statusBadge = `<div class="status-badge owned">所持</div>`;
         }
 
+        // Tags generation
+        const tagsHtml = (book.tags || []).slice(0, 3).map(tag =>
+            `<span class="mini-tag clickable" data-search="${tag}">#${tag}</span>`
+        ).join('');
+
+        // Progress bar for list view (in Info section)
+        const progressHtml = (book.status === 'reading' && progress > 0) ?
+            `<div class="reading-progress-container">
+                <div class="reading-progress-bar-list">
+                    <div class="progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <span class="progress-percentage">${progress}%</span>
+            </div>` : '';
+
         item.innerHTML = `
             <div class="book-cover-wrapper">
                 ${coverHtml}
                 ${statusBadge}
-                ${book.status === 'reading' && progress > 0 ?
-                `<div class="reading-progress-bar">
-                        <div class="progress-fill" style="width: ${progress}%"></div>
-                    </div>` : ''}
             </div>
             <div class="book-info">
                 <div class="book-title">${book.title}</div>
                 <div class="book-meta">
-                    <span class="book-author">${book.author || '著者不明'}</span>
+                    <span class="book-author clickable" data-search="${book.author || ''}">${book.author || '著者不明'}</span>
+                </div>
+                ${progressHtml}
+                <div class="book-tags-list">
+                    ${tagsHtml}
                 </div>
             </div>
         `;
 
-        item.addEventListener('click', () => App.openDetail(book.id));
+        item.addEventListener('click', (e) => {
+            const clickable = e.target.closest('.clickable');
+            if (clickable) {
+                e.stopPropagation();
+                const term = clickable.dataset.search;
+                // Expose App or use event dispatch
+                if (term && window.App && window.App.search) {
+                    window.App.search(term);
+                } else {
+                    console.warn('Search function not available');
+                }
+            } else {
+                App.openDetail(book.id);
+            }
+        });
 
         return item;
     },
