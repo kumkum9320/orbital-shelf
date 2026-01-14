@@ -322,10 +322,12 @@ body::before {
 
 .bookshelf-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    /* 2 columns for mobile */
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* Use minmax(0, 1fr) to prevent overflow */
     gap: 16px 12px;
     max-width: 800px;
+    width: 100%;
+    /* Ensure it fits container */
     margin: 0 auto;
     justify-items: center;
 }
