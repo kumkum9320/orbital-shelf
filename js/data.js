@@ -221,16 +221,16 @@ const DataManager = {
 
     getAllTags() {
         const tagSet = new Set();
-        this.localCache.forEach(book => {
-            if (Array.isArray(book.tags)) book.tags.forEach(tag => tagSet.add(tag));
+        (this.localCache || []).forEach(book => {
+            if (book && Array.isArray(book.tags)) book.tags.forEach(tag => tagSet.add(tag));
         });
         return Array.from(tagSet);
     },
 
     getAllGenres() {
         const genreSet = new Set();
-        this.localCache.forEach(book => {
-            if (Array.isArray(book.tags) && book.tags.length > 0) genreSet.add(book.tags[0]);
+        (this.localCache || []).forEach(book => {
+            if (book && Array.isArray(book.tags) && book.tags.length > 0) genreSet.add(book.tags[0]);
         });
         return Array.from(genreSet);
     },

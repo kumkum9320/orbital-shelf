@@ -290,7 +290,7 @@ const App = {
             UI.renderGenreTabs(genres);
         } catch (e) {
             console.error('Error rendering books:', e);
-            UI.showToast('描画エラーが発生しました');
+            UI.showToast(`描画エラー: ${e.message}`);
         }
     },
 
