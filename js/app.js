@@ -76,6 +76,13 @@ const App = {
         // Login button
         document.getElementById('btnGoogleLogin').addEventListener('click', () => this.handleLogin());
 
+        // Logout button
+        document.getElementById('btnLogout').addEventListener('click', () => {
+            if (confirm('ログアウトしますか？')) {
+                this.handleLogout();
+            }
+        });
+
         // Add button
         document.getElementById('btnAdd').addEventListener('click', () => this.openAddModal());
         document.getElementById('btnAddFirst').addEventListener('click', () => this.openAddModal());
