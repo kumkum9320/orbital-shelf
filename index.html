@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Orbital Shelf">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <title>Orbital Shelf</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-left">
+            <h1 class="logo">📚 Orbital Shelf</h1>
+        </div>
+        <div class="header-right">
+            <button class="btn-icon" id="btnAITag" aria-label="AIタグ付け" title="外部AIでタグ付け">
+                <span style="font-size: 18px;">🏷️</span>
+            </button>
+            <button class="btn-icon" id="btnAdd" aria-label="本を追加">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Search & Filters -->
+    <section class="filters-section">
+        <div class="search-box">
+            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" placeholder="タイトル、著者、タグで検索..." autocomplete="off">
+            <button class="btn-clear" id="btnClearSearch" aria-label="クリア">×</button>
+        </div>
+
+        <!-- Status Tabs -->
+        <div class="status-tabs" id="statusTabs">
+            <button class="tab active" data-status="all">All</button>
+            <button class="tab" data-status="reading">Reading</button>
+            <button class="tab" data-status="finished">Finished</button>
+            <button class="tab" data-status="wish">Wish</button>
+        </div>
+
+        <!-- Genre Tags (auto-generated) -->
+        <div class="genre-tags" id="genreTags"></div>
+    </section>
+
+    <!-- Bookshelf Grid Container -->
+    <main class="bookshelf-container" id="bookshelfContainer">
+        <div class="bookshelf-grid" id="bookshelfGrid">
+            <!-- Book covers will be rendered here -->
+        </div>
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">📚</div>
+            <p>本棚に本がありません</p>
+            <button class="btn-primary" id="btnAddFirst">最初の本を追加</button>
+        </div>
+    </main>
+
+    <!-- Book Count -->
+    <div class="book-count" id="bookCount">0 冊</div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="modalAdd">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalAddTitle">本を追加</h2>
+                <button class="btn-close" id="btnCloseAdd">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Book Search Section -->
+                <div class="book-search-section">
+                    <label>📚 書籍検索 (Google Books)</label>
+                    <div class="search-input-row">
+                        <input type="text" id="bookSearchQuery" placeholder="ISBNまたはタイトル・著者で検索...">
+                        <button class="btn-search" id="btnSearchBook" title="検索">🔍</button>
+                    </div>
+                    <div class="search-results-container" id="searchResultsContainer">
+                        <div class="search-loading" id="searchLoading">
+                            <span class="loader"></span>検索中...
+                        </div>
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- AI Assist Section -->
+                <div class="ai-assist-section collapsed">
+                    <button class="ai-toggle" id="btnToggleAI">
+                        <span>✨ AI入力アシスト</span>
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                    <div class="ai-content" id="aiContent">
+                        <div class="ai-input-row">
+                            <input type="text" id="aiKeyword" placeholder="本のタイトルや著者を入力...">
+                            <button class="btn-sparkle" id="btnGeneratePrompt" title="プロンプト生成">✨</button>
+                        </div>
+                        <div class="ai-json-row">
+                            <textarea id="aiJsonInput" placeholder="AIが生成したJSONをここに貼り付け..." rows="3"></textarea>
+                            <button class="btn-import" id="btnImportJson" title="JSON取り込み">↓</button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Manual Form -->
+                <form id="bookForm">
+                    <input type="hidden" id="bookId">
+
+                    <div class="form-group">
+                        <label for="bookTitle">タイトル *</label>
+                        <input type="text" id="bookTitle" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookAuthor">著者</label>
+                        <input type="text" id="bookAuthor" placeholder="著者A, 著者B (訳)">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookPublisher">出版社</label>
+                            <input type="text" id="bookPublisher">
+                        </div>
+                        <div class="form-group">
+                            <label for="bookIsbn">ISBN</label>
+                            <input type="text" id="bookIsbn" placeholder="978...">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="bookTotalPages">総ページ数</label>
+                            <input type="number" id="bookTotalPages" min="1">
+                        </div>
+                        <div class="form-group">
+                            <label for="bookCurrentPage">現在のページ</label>
+                            <input type="number" id="bookCurrentPage" min="0" value="0">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookStatus">ステータス</label>
+                        <select id="bookStatus">
+                            <option value="wish">買いたい (Wish)</option>
+                            <option value="reading">読書中 (Reading)</option>
+                            <option value="finished">読了 (Finished)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookOwnership">所有形態</label>
+                        <select id="bookOwnership">
+                            <option value="">未設定</option>
+                            <option value="owned">所有 (Owned)</option>
+                            <option value="borrowed">借りている (Borrowed)</option>
+                            <option value="digital">電子書籍 (Digital)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookTags">タグ（カンマ区切り）</label>
+                        <input type="text" id="bookTags" placeholder="ミステリー, ベストセラー">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bookCover">書影URL</label>
+                        <input type="url" id="bookCover" placeholder="https://...">
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="btnCancelAdd">キャンセル</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal (Expanded) -->
+    <div class="modal" id="modalDetail">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-detail">
+            <div class="modal-header">
+                <h2 id="detailTitle">本の詳細</h2>
+                <button class="btn-close" id="btnCloseDetail">×</button>
+            </div>
+            <div class="modal-body detail-body" id="detailBody">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Reading Log Modal -->
+    <div class="modal" id="modalLog">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-log">
+            <div class="modal-header">
+                <h2>読書ログを記録</h2>
+                <button class="btn-close" id="btnCloseLog">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="logForm">
+                    <input type="hidden" id="logBookId">
+                    <div class="form-group">
+                        <label for="logPage">読んだページ（現在位置）</label>
+                        <input type="number" id="logPage" min="0" required>
+                        <span class="hint" id="logPageHint"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="logMemo">今日のメモ</label>
+                        <textarea id="logMemo" rows="3" placeholder="感想やメモ..."></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="btnCancelLog">キャンセル</button>
+                        <button type="submit" class="btn-primary">記録</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Tag Assist Modal -->
+    <div class="modal" id="modalAITag">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-ai-tag">
+            <div class="modal-header">
+                <h2>🏷️ AIタグ付けアシスト</h2>
+                <button class="btn-close" id="btnCloseAITag">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Untagged books list -->
+                <div class="ai-tag-section">
+                    <h3>タグなしの本</h3>
+                    <div class="untagged-books-list" id="untaggedBooksList">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Prompt Generation -->
+                <div class="ai-tag-section">
+                    <h3>① プロンプトをコピー</h3>
+                    <p class="section-hint">以下のボタンでプロンプトをクリップボードにコピーし、外部AIに貼り付けてください。</p>
+                    <button class="btn-primary btn-full" id="btnCopyTagPrompt">📋 タグ付けプロンプトをコピー</button>
+                </div>
+
+                <hr class="divider">
+
+                <!-- JSON Import -->
+                <div class="ai-tag-section">
+                    <h3>② AIの出力を貼り付け</h3>
+                    <p class="section-hint">AIが出力したJSONを貼り付けて「適用」を押してください。</p>
+                    <textarea id="aiTagJsonInput" placeholder='[{"id":"book_xxx","tags":["ジャンル","タグ1","タグ2"]}]'
+                        rows="6"></textarea>
+                    <button class="btn-primary btn-full" id="btnApplyTags">✨ タグを適用</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal modal-confirm" id="modalDeleteConfirm">
+        <div class="modal-overlay"></div>
+        <div class="modal-content modal-confirm-content">
+            <div class="confirm-icon">🗑️</div>
+            <h3 class="confirm-title">本を削除しますか？</h3>
+            <p class="confirm-message" id="deleteConfirmMessage">この操作は取り消せません。</p>
+            <input type="hidden" id="deleteTargetId">
+            <div class="confirm-actions">
+                <button class="btn-secondary" id="btnCancelDelete">キャンセル</button>
+                <button class="btn-danger" id="btnConfirmDelete">削除する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="js/data.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
