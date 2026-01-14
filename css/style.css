@@ -308,7 +308,6 @@ body::before {
 }
 
 /* ===== Bookshelf Grid Container ===== */
-/* ===== Bookshelf Grid Container ===== */
 .bookshelf-container {
     position: fixed;
     top: calc(var(--header-height) + var(--filter-height) + var(--header-safe-area));
@@ -323,17 +322,21 @@ body::before {
 
 .bookshelf-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    /* Fixed 3 columns for mobile */
-    gap: 12px 10px;
+    grid-template-columns: repeat(2, 1fr);
+    /* 2 columns for mobile */
+    gap: 24px 16px;
     max-width: 800px;
     margin: 0 auto;
+    justify-items: center;
+    /* Center items in their cells */
 }
 
 @media (min-width: 600px) {
     .bookshelf-grid {
         grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         gap: 20px 16px;
+        justify-items: start;
+        /* Reset for desktop */
     }
 }
 
@@ -344,12 +347,26 @@ body::before {
     gap: 8px;
     cursor: pointer;
     position: relative;
+    width: auto;
+    height: 280px;
+    /* Fixed height container */
+    max-width: 100%;
+}
+
+@media (min-width: 600px) {
+    .book-item {
+        height: auto;
+        width: 100%;
+    }
 }
 
 /* Book Cover Wrapper */
 .book-cover-wrapper {
     position: relative;
-    width: 100%;
+    height: auto;
+    flex: 1;
+    width: auto;
+    max-width: 100%;
     aspect-ratio: 2/3;
     border-radius: 6px;
     overflow: hidden;
