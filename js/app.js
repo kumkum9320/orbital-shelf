@@ -15,7 +15,7 @@ const App = {
         this.registerServiceWorker();
 
         // Initial View
-        this.switchView('home');
+        this.switchView('library');
 
         // Wait for auth state
         const user = await AuthManager.init();
@@ -126,10 +126,13 @@ const App = {
         document.getElementById('btnCancelLog').addEventListener('click', () => this.closeModal('modalLog'));
         document.querySelector('#modalLog .modal-overlay').addEventListener('click', () => this.closeModal('modalLog'));
 
-        // Status tabs
-        document.querySelectorAll('.status-tabs .tab').forEach(tab => {
+        // Status filters
+        document.querySelectorAll('.filter-chip.status-chip').forEach(tab => {
             tab.addEventListener('click', () => this.filterByStatus(tab.dataset.status));
         });
+
+        // Genre filters (Delegation for dynamic buttons)
+        /* moved to inline onclick or handle via UI render */
 
         // Sort select
         const sortSelect = document.getElementById('sortSelect');
@@ -188,16 +191,11 @@ const App = {
         this.currentView = viewName;
 
         // DOM Elements
-        const filterArea = document.getElementById('searchFilterArea');
-        const bookshelf = document.getElementById('bookshelfContainer'); // Used for Home & Search
+        const libraryHeader = document.getElementById('libraryHeader');
+        const bookshelf = document.getElementById('bookshelfContainer');
         const personalView = document.getElementById('personalView');
         const navItems = document.querySelectorAll('.nav-item[data-target]');
-        const bookCountTarget = document.getElementById('bookCount'); // Hide/Show book count?
-
-        // Reset Nav Active State
-        navItems.forEach(item => item.classList.remove('active'));
-        const activeNav = document.querySelector(`.nav-item[data-target="${viewName}"]`);
-        if (activeNav) activeNav.classList.add('active');
+        const bookCountTarget = document.getElementById('bookCount');
 
         // Helper to toggle visibility
         const toggle = (el, show) => {
@@ -211,25 +209,28 @@ const App = {
             }
         };
 
+        // Reset Nav Active State
+        navItems.forEach(item => item.classList.remove('active'));
+
         // Toggle Views
-        if (viewName === 'home') {
-            toggle(filterArea, false);
+        if (viewName === 'library' || viewName === 'home' || viewName === 'search') {
+            toggle(libraryHeader, true);
             toggle(bookshelf, true);
             toggle(personalView, false);
             if (bookCountTarget) bookCountTarget.style.display = 'block';
 
-        } else if (viewName === 'search') {
-            toggle(filterArea, true);
-            toggle(bookshelf, true);
-            toggle(personalView, false);
-            if (bookCountTarget) bookCountTarget.style.display = 'block';
+            const activeNav = document.getElementById('navLibrary');
+            if (activeNav) activeNav.classList.add('active');
 
         } else if (viewName === 'personal') {
-            toggle(filterArea, false);
+            toggle(libraryHeader, false);
             toggle(bookshelf, false);
             toggle(personalView, true);
             if (bookCountTarget) bookCountTarget.style.display = 'none';
             this.updatePersonalStats();
+
+            const activeNav = document.getElementById('navPersonal');
+            if (activeNav) activeNav.classList.add('active');
         }
     },
 
@@ -311,10 +312,39 @@ const App = {
     },
 
     filterByStatus(status) {
-        this.currentFilter.status = status;
-        this.currentFilter.genre = null;
-        UI.setActiveStatusTab(status);
-        UI.setActiveGenreTab(null);
+        let current = this.currentFilter.status;
+        // Ensure current is array
+        if (!Array.isArray(current)) {
+            current = (current === 'all') ? ['all'] : [current];
+        }
+
+        if (status === 'all') {
+            current = ['all'];
+        } else {
+            // If 'all' was active, clear it
+            if (current.includes('all')) {
+                current = [];
+            }
+
+            // Toggle status
+            if (current.includes(status)) {
+                current = current.filter(s => s !== status);
+            } else {
+                current.push(status);
+            }
+
+            // If empty, revert to 'all'
+            if (current.length === 0) {
+                current = ['all'];
+            }
+        }
+
+        this.currentFilter.status = current;
+        // Don't reset genre automatically to allow combining
+        // this.currentFilter.genre = null; 
+
+        UI.setActiveStatusTab(current);
+        // UI.setActiveGenreTab(null); // Keep genre styling
         this.loadBooks();
     },
 

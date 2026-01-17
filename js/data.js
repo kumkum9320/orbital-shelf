@@ -247,7 +247,13 @@ const DataManager = {
     filterBooks(criteria = {}) {
         let books = this.localCache;
         if (criteria.status && criteria.status !== 'all') {
-            books = books.filter(book => book.status === criteria.status);
+            if (Array.isArray(criteria.status)) {
+                if (criteria.status.length > 0 && !criteria.status.includes('all')) {
+                    books = books.filter(book => criteria.status.includes(book.status));
+                }
+            } else {
+                books = books.filter(book => book.status === criteria.status);
+            }
         }
         if (criteria.genre) {
             books = books.filter(book => Array.isArray(book.tags) && book.tags[0] === criteria.genre);

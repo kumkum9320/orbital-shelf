@@ -287,110 +287,82 @@ body::before {
     color: var(--text-primary);
 }
 
-/* Filter Controls Row */
-.filter-controls-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+/* ===== New Filter Styles ===== */
+.search-box-container {
     margin-bottom: 12px;
 }
 
-/* Status Tabs */
-.status-tabs {
+.filter-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding-left: 4px;
+}
+
+.filter-scroll-wrapper {
     display: flex;
     gap: 8px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+    /* Hide scrollbar */
     scrollbar-width: none;
-    flex: 1;
-    /* Take available space */
-    padding-right: 4px;
-    /* Optional padding */
+    -ms-overflow-style: none;
 }
 
-.status-tabs::-webkit-scrollbar {
+.filter-scroll-wrapper::-webkit-scrollbar {
     display: none;
 }
 
-.sort-control {
+/* Chip Styles */
+.filter-chip {
     flex-shrink: 0;
-}
-
-.sort-select {
-    height: 38px;
-    /* Match tab height roughly */
-    padding: 0 12px;
-    background: var(--bg-glass);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    outline: none;
-    cursor: pointer;
-    transition: var(--transition-fast);
-}
-
-.sort-select:hover {
-    background: rgba(255, 255, 255, 0.5);
-    border-color: var(--text-muted);
-}
-
-.tab {
-    flex-shrink: 0;
-    padding: 8px 16px;
-    background: var(--bg-glass);
-    border: 1px solid var(--border-color);
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 20px;
     color: var(--text-secondary);
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    transition: var(--transition-fast);
-}
-
-.tab:hover {
-    background: rgba(255, 255, 255, 0.12);
-}
-
-.tab.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
-}
-
-/* Genre Tags */
-.genre-tags {
+    transition: all 0.2s ease;
+    white-space: nowrap;
     display: flex;
+    align-items: center;
     gap: 6px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 4px;
 }
 
-.genre-tags::-webkit-scrollbar {
-    display: none;
+.filter-chip:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.genre-tag {
-    flex-shrink: 0;
+.filter-chip.active {
+    background: var(--accent);
+    color: var(--primary-color);
+    border-color: var(--accent);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.filter-chip.genre-chip {
+    font-size: 0.8rem;
     padding: 6px 12px;
-    background: transparent;
-    border: 1px solid var(--tag-color, var(--border-color));
-    border-radius: 16px;
-    color: var(--tag-color, var(--text-secondary));
-    font-size: 0.75rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition-fast);
 }
 
-.genre-tag:hover,
-.genre-tag.active {
-    background: var(--tag-color, var(--accent));
-    color: white;
-    border-color: var(--tag-color, var(--accent));
+.sort-row {
+    align-items: flex-end;
 }
 
 /* ===== Bookshelf Grid Container ===== */
@@ -497,7 +469,8 @@ body::before {
 }
 
 .stat-card {
-    background: white;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     padding: 16px;
     border-radius: 16px;
     box-shadow: var(--shadow-card);
@@ -506,14 +479,14 @@ body::before {
     align-items: center;
     text-align: center;
     gap: 8px;
+    backdrop-filter: blur(10px);
 }
 
 .stat-value {
     font-size: 1.8rem;
     font-weight: 800;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .stat-label {
@@ -522,10 +495,12 @@ body::before {
 }
 
 .menu-list {
-    background: white;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     overflow: hidden;
     box-shadow: var(--shadow-card);
+    backdrop-filter: blur(10px);
 }
 
 .menu-item {
@@ -535,11 +510,16 @@ body::before {
     padding: 16px;
     background: none;
     border: none;
-    border-bottom: 1px solid var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
     font-size: 1rem;
     color: var(--text-primary);
     cursor: pointer;
     text-align: left;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .menu-item:last-child {

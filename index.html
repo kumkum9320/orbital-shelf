@@ -30,40 +30,53 @@
         </div>
     </header>
 
-    <!-- Search & Filters (Initially Hidden for Home View) -->
-    <section class="filters-section" id="searchFilterArea" style="display: none;">
-        <div class="search-box">
-            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" id="searchInput" placeholder="タイトル、著者、タグで検索..." autocomplete="off">
-            <button class="btn-clear" id="btnClearSearch" aria-label="クリア">×</button>
-        </div>
-
-        <div class="filter-controls-row">
-            <!-- Status Tabs -->
-            <div class="status-tabs" id="statusTabs">
-                <button class="tab active" data-status="all">すべて</button>
-                <button class="tab" data-status="reading">読書中</button>
-                <button class="tab" data-status="finished">完読</button>
-                <button class="tab" data-status="wish">読みたい</button>
-            </div>
-
-            <!-- Sort Select -->
-            <div class="sort-control">
-                <select id="sortSelect" class="sort-select" aria-label="並べ替え">
-                    <option value="updated_desc">更新: 新しい順</option>
-                    <option value="updated_asc">更新: 古い順</option>
-                    <option value="created_desc">登録: 新しい順</option>
-                    <option value="created_asc">登録: 古い順</option>
-                </select>
+    <!-- Library Header (Search & Filters) -->
+    <section class="filters-section" id="libraryHeader">
+        <div class="search-box-container">
+            <div class="search-box">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" placeholder="タイトル、著者、タグで検索..." autocomplete="off">
+                <button class="btn-clear" id="btnClearSearch" aria-label="クリア" style="display: none;">×</button>
             </div>
         </div>
 
-        <!-- Genre Tags (auto-generated) -->
-        <div class="genre-tags" id="genreTags"></div>
+        <div class="filter-rows">
+            <!-- Status Filter (Multi-select) -->
+            <div class="filter-row">
+                <div class="filter-label">ステータス</div>
+                <div class="filter-scroll-wrapper no-scrollbar" id="statusFilters">
+                    <button class="filter-chip status-chip active" data-status="all">すべて</button>
+                    <button class="filter-chip status-chip" data-status="reading">📖 読書中</button>
+                    <button class="filter-chip status-chip" data-status="finished">✅ 読了</button>
+                    <button class="filter-chip status-chip" data-status="wish">⭐ 読みたい</button>
+                </div>
+            </div>
+
+            <!-- Genre Filter -->
+            <div class="filter-row">
+                <div class="filter-label">ジャンル</div>
+                <div class="filter-scroll-wrapper no-scrollbar" id="genreFilters">
+                    <button class="filter-chip genre-chip active" data-genre="all">すべて</button>
+                    <!-- JS populated -->
+                </div>
+            </div>
+
+            <!-- Sort Control (Optional, maybe collapse or keep small) -->
+            <div class="filter-row sort-row">
+                <div class="sort-control">
+                    <select id="sortSelect" class="sort-select" aria-label="並べ替え">
+                        <option value="updated_desc">更新: 新しい順</option>
+                        <option value="updated_asc">更新: 古い順</option>
+                        <option value="created_desc">登録: 新しい順</option>
+                        <option value="created_asc">登録: 古い順</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Bookshelf Grid Container -->
@@ -113,32 +126,28 @@
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
-        <button class="nav-item active" data-target="home">
+        <button class="nav-item active" data-target="home" id="navLibrary">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
-            <span>Home</span>
+            <span>ライブラリ</span>
         </button>
-        <button class="nav-item" data-target="search">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <span>Search</span>
-        </button>
+        <!-- Home and Search merged into Library (using home logic initially) -->
+
         <button class="nav-item" id="btnAddFooter">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            <span>Add</span>
+            <span>追加</span>
         </button>
         <button class="nav-item" data-target="personal">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round"
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span>Personal</span>
+            <span>マイページ</span>
         </button>
     </nav>
 
