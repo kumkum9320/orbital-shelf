@@ -39,10 +39,16 @@ self.addEventListener('fetch', (event) => {
             .then((response) => {
                 // Clone and cache successful responses
                 if (response.ok) {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, clone);
-                    });
+                    // Only cache GET requests and valid schemes
+                    if (event.request.method === 'GET' &&
+                        (event.request.url.startsWith('http') || event.request.url.startsWith('https')) &&
+                        !event.request.url.includes('chrome-extension')) {
+
+                        const clone = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, clone);
+                        });
+                    }
                 }
                 return response;
             })
