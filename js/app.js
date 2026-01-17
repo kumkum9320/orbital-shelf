@@ -301,9 +301,14 @@ const App = {
     },
 
     searchByKeyword(keyword) {
-        this.switchView('search');
-        UI.elements.searchInput.value = keyword;
-        this.handleSearch();
+        this.switchView('library');
+        // Wait for view switch to ensure elements are visible/cached if needed
+        setTimeout(() => {
+            if (UI.elements.searchInput) {
+                UI.elements.searchInput.value = keyword;
+                this.handleSearch();
+            }
+        }, 10);
     },
 
     // Public search method called from UI clicks

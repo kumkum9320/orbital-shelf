@@ -50,7 +50,83 @@ const UI = {
         });
     },
 
-    // ... createBookItem omit ...
+    createBookItem(book) {
+        const item = document.createElement('div');
+        item.className = 'book-item';
+        item.dataset.id = book.id;
+        item.dataset.status = book.status;
+
+        const title = book.title || '無題';
+        const genre = book.tags && book.tags[0] ? book.tags[0] : null;
+        const genreColor = genre ? DataManager.getGenreColor(genre) : 'var(--genre-default)';
+        const progress = DataManager.getProgress(book);
+
+        const coverHtml = book.coverUrl
+            ? `<img src="${book.coverUrl}" alt="${title}" loading="lazy">`
+            : `<div class="cover-placeholder" style="background: linear-gradient(135deg, ${genreColor}22, ${genreColor}44)">
+                    <span class="cover-text" style="color: ${genreColor}; text-shadow: none;">${title.substring(0, 4)}</span>
+               </div>`;
+
+        // Status indicator (Simplified)
+        let statusBadge = '';
+        if (book.status === 'finished') {
+            statusBadge = `<div class="status-badge finished">完読</div>`;
+        } else if (book.status === 'reading') {
+            statusBadge = `<div class="status-badge reading">読書中</div>`;
+        } else if (book.ownership === 'owned') {
+            // Only show owned if not handled above
+            statusBadge = `<div class="status-badge owned">所持</div>`;
+        }
+
+        // Tags generation
+        const tagsHtml = (book.tags || []).slice(0, 3).map(tag =>
+            `<span class="mini-tag clickable" data-search="${tag}">#${tag}</span>`
+        ).join('');
+
+        // Progress bar for list view (in Info section)
+        const progressHtml = (book.status === 'reading' && progress > 0) ?
+            `<div class="reading-progress-container">
+                <div class="reading-progress-bar-list">
+                    <div class="progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <span class="progress-percentage">${progress}%</span>
+            </div>` : '';
+
+        item.innerHTML = `
+            <div class="book-cover-wrapper">
+                ${coverHtml}
+                ${statusBadge}
+            </div>
+            <div class="book-info">
+                <div class="book-title">${title}</div>
+                <div class="book-meta">
+                    <span class="book-author clickable" data-search="${book.author || ''}">${book.author || '著者不明'}</span>
+                </div>
+                ${progressHtml}
+                <div class="book-tags-list">
+                    ${tagsHtml}
+                </div>
+            </div>
+        `;
+
+        item.addEventListener('click', (e) => {
+            const clickable = e.target.closest('.clickable');
+            if (clickable) {
+                e.stopPropagation();
+                const term = clickable.dataset.search;
+                // Expose App or use event dispatch
+                if (window.App && window.App.search) {
+                    window.App.search(term);
+                } else {
+                    console.warn('Search function not available');
+                }
+            } else {
+                App.openDetail(book.id);
+            }
+        });
+
+        return item;
+    },
 
     renderGenreTabs(genres) {
         const container = this.elements.genreFilters;
